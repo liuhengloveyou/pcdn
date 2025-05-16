@@ -1,0 +1,26 @@
+log_dir: "./logs"
+log_level: "debug"
+# mysql: "trade:zHFdH83dyTyeC8Xp@tcp(127.0.0.1:3306)/trade?charset=utf8mb4&parseTime=True&loc=Local"
+mysql: "root:lhisroot@tcp(192.168.226.128:3306)/pcdn?charset=utf8mb4&parseTime=True&loc=Local"
+
+domain: ""
+session_key: "pcdn-sess"
+session_store_type: "cookie"
+session_expire: 259200
+
+# sms配置
+sms: "" # sms供应商名，为空不启用sms相关功能。tencentcloud / ...
+sms_conf:
+  secret_id: "AKID6IVl2IIg4EOZpDWGzfHrS1W1UyV3a5X4"
+  secret_key: "fIrdRIC6yutsojfgks8Sm9JXefjhcRFw"
+  sdk_app_id: "1400831038"
+  sign_name: "domiai"
+  user_add_template_id: "1838424"
+  user_login_template_id: "1838424"
+  
+# 哆咪AI2代
+wx_appid: "wx0fd775b6dfdfc7d5"
+wx_secret: "a0e9b07a2b24ffa5b73ebc372fb36119"
+
+
+

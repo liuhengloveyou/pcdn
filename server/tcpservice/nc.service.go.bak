@@ -1,0 +1,62 @@
+package tcpservice
+
+import (
+	"fmt"
+	"net"
+	"strings"
+
+	"csmm/common"
+
+	"go.uber.org/zap"
+)
+
+// 处理函数
+func processNc(conn net.Conn) error {
+	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
+	tmpCsmm := CsmmMap[remoteAddr]
+	if tmpCsmm != nil {
+		tmpCsmm.NcConn = &conn
+	}
+	common.Logger.Info("nc: ", zap.Any("remoteAddr", remoteAddr), zap.Any("csmm", tmpCsmm))
+
+	// defer conn.Close() //关闭连接
+
+	// if _, err := conn.Write([]byte("ls\n")); err != nil {
+	// 	return err
+	// }
+
+	// data := bytes.NewBuffer([]byte{})
+	// reader := bufio.NewReader(conn) //获取输入流
+
+	// for {
+	// 	var buf [1024]byte            //每次读取的大小
+	// 	n, err := reader.Read(buf[:]) //读取数据 从头到尾读取
+	// 	if err != nil {
+	// 		fmt.Println("read from client failed,err", err)
+	// 		break
+	// 	}
+
+	// 	data.Write(buf[:n])
+	// 	fmt.Println(">>>>>>", data.String())
+
+	// }
+
+	return nil
+}
+
+func InitTaskService(addr string) {
+	listen, err := net.Listen("tcp", addr)
+	if err != nil {
+		fmt.Println("listen failed,err", err)
+		return
+	}
+	for {
+		conn, err := listen.Accept()
+		if err != nil {
+			fmt.Println("accept failed,err", err)
+			continue
+		}
+
+		go processNc(conn) //开启启程去处理读取数据
+	}
+}
