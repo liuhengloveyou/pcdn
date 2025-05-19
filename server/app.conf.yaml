@@ -1,10 +1,10 @@
-pid: "/tmp/arbitrage.pid"
-addr: ":10000"
-mysql: "root:lhisroot@tcp(192.168.226.128:3306)/arbitrage?charset=utf8mb4&parseTime=True&loc=Local"
-# mysql: "trade:zHFdH83dyTyeC8Xp@tcp(127.0.0.1:3306)/trade?charset=utf8mb4&parseTime=True&loc=Local"
-redis: "192.168.226.128:6379"
+pid: "/tmp/pcdn.pid"
 log_dir: "./logs/" # 日志目录
 log_level: "debug"
-img_dir: "/opt/arbitrage/images/" # 图片上传目录
+http_server_addr: ":10000"
+tcp_server_addr: ":10001"
+mysql: "root:lhisroot@tcp(127.0.0.1:3306)/pcdn?charset=utf8mb4&parseTime=True&loc=Local"
+redis: "127.0.0.1:6379"
+img_dir: "/opt/pcdn-server/images/" # 图片上传目录
 
 receiver: "0x32Acf1A0DE3AE6a96582d5c5AEB171ABD6e609F3"

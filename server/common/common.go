@@ -37,17 +37,18 @@ var (
 )
 
 type ConfigStruct struct {
-	PID         string `yaml:"pid"`
-	Host        string `yaml:"host"`
-	Addr        string `yaml:"addr"`
-	Mysql       string `yaml:"mysql"`
-	Redis       string `yaml:"redis"`
-	UploadDir   string `yaml:"upload_dir"`
-	FileDir     string `yaml:"file_dir"`
-	LogDir      string `yaml:"log_dir"`
-	LogLevel    string `yaml:"log_level"`
-	ImgDir      string `yaml:"img_dir"`       // 图片上传目录
-	SotreImgDir string `yaml:"store_img_dir"` // 入库单图片上传目录
+	PID            string `yaml:"pid"`
+	Host           string `yaml:"host"`
+	HttpServerAddr string `yaml:"http_server_addr"`
+	TcpServerAddr  string `yaml:"tcp_server_addr"`
+	MysqlURN       string `yaml:"mysql_urn"`
+	Redis          string `yaml:"redis"`
+	UploadDir      string `yaml:"upload_dir"`
+	FileDir        string `yaml:"file_dir"`
+	LogDir         string `yaml:"log_dir"`
+	LogLevel       string `yaml:"log_level"`
+	ImgDir         string `yaml:"img_dir"`       // 图片上传目录
+	SotreImgDir    string `yaml:"store_img_dir"` // 入库单图片上传目录
 	// 收款地址
 	Receiver string `yaml:"receiver"`
 
@@ -64,9 +65,9 @@ func init() {
 		panic(e)
 	}
 
-	if len(ServConfig.Mysql) > 0 {
-		if e := InitGorm(ServConfig.Mysql); e != nil {
-			fmt.Println("InitGorm: ", ServConfig.Mysql, e)
+	if len(ServConfig.MysqlURN) > 0 {
+		if e := InitGorm(ServConfig.MysqlURN); e != nil {
+			fmt.Println("InitGorm: ", ServConfig.MysqlURN, e)
 			panic(e)
 		}
 	}

@@ -1,12 +1,11 @@
 package service
 
 import (
-	"arbitrage/channels"
-	"arbitrage/common"
-	"arbitrage/marts"
-	"arbitrage/protos"
-	"arbitrage/repos"
 	"fmt"
+	"pcdn-server/channels"
+	"pcdn-server/common"
+	"pcdn-server/protos"
+	"pcdn-server/repos"
 	"strconv"
 	"strings"
 	"time"
@@ -148,79 +147,79 @@ func (s *botService) Run(sessionUser *passportprotos.User, botId uint64, botType
 	}
 
 	// 建一个交易市场API客户端
-	var martA, martB marts.Mart
-	if botType == int64(protos.BotTypeTimerReport) {
-		martA = marts.GetMartByName(m.TimerReportBot.MartA)
-		martB = marts.GetMartByName(m.TimerReportBot.MartB)
-	} else if botType == int64(protos.BotTypeObserveAndReport) {
-		martA = marts.GetMartByName(m.ObserveAndReportBot.MartA)
-		martB = marts.GetMartByName(m.ObserveAndReportBot.MartB)
-	} else if botType == int64(protos.BotTypeArbirageDepth1) {
-		martA = marts.GetMartByName(m.ArbirageDepth1Bot.MartA)
-		martB = marts.GetMartByName(m.ArbirageDepth1Bot.MartB)
-	}
-	if martA == nil || martB == nil {
-		common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
-		return 0, common.ErrMartParamKey
-	}
+	// var martA, martB marts.Mart
+	// if botType == int64(protos.BotTypeTimerReport) {
+	// 	martA = marts.GetMartByName(m.TimerReportBot.MartA)
+	// 	martB = marts.GetMartByName(m.TimerReportBot.MartB)
+	// } else if botType == int64(protos.BotTypeObserveAndReport) {
+	// 	martA = marts.GetMartByName(m.ObserveAndReportBot.MartA)
+	// 	martB = marts.GetMartByName(m.ObserveAndReportBot.MartB)
+	// } else if botType == int64(protos.BotTypeArbirageDepth1) {
+	// 	martA = marts.GetMartByName(m.ArbirageDepth1Bot.MartA)
+	// 	martB = marts.GetMartByName(m.ArbirageDepth1Bot.MartB)
+	// }
+	// if martA == nil || martB == nil {
+	// 	common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
+	// 	return 0, common.ErrMartParamKey
+	// }
 	// 查询用户的账号配置
-	martParam, err := MartParamService.Select(sessionUser.UID, 0, martA.GetName())
-	if err != nil || martParam == nil {
-		common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
-		return 0, common.ErrMartParamKey
-	}
+	// martParam, err := MartParamService.Select(sessionUser.UID, 0, martA.GetName())
+	// if err != nil || martParam == nil {
+	// 	common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
+	// 	return 0, common.ErrMartParamKey
+	// }
 
-	if err = martA.Init(&protos.MartParamModel{
-		MartDomain: martParam.MartDomain,
-		AccessKey:  martParam.AccessKey,
-		SecretKey:  martParam.SecretKey,
-		Passphrase: martParam.Passphrase,
-		Memo:       martParam.Memo,
-	}); err != nil {
-		common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
-		return 0, common.ErrMartParamKey
-	}
+	// if err = martA.Init(&protos.MartParamModel{
+	// 	MartDomain: martParam.MartDomain,
+	// 	AccessKey:  martParam.AccessKey,
+	// 	SecretKey:  martParam.SecretKey,
+	// 	Passphrase: martParam.Passphrase,
+	// 	Memo:       martParam.Memo,
+	// }); err != nil {
+	// 	common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
+	// 	return 0, common.ErrMartParamKey
+	// }
 
 	// 建一个交易市场API客户端
 	// 查询用户的账号配置
-	martParam, err = MartParamService.Select(sessionUser.UID, 0, martB.GetName())
-	if err != nil || martParam == nil {
-		common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
-		return 0, common.ErrMartParamKey
-	}
+	// martParam, err = MartParamService.Select(sessionUser.UID, 0, martB.GetName())
+	// if err != nil || martParam == nil {
+	// 	common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
+	// 	return 0, common.ErrMartParamKey
+	// }
 
-	if err = martB.Init(&protos.MartParamModel{
-		MartDomain: martParam.MartDomain,
-		AccessKey:  martParam.AccessKey,
-		SecretKey:  martParam.SecretKey,
-		Passphrase: martParam.Passphrase,
-		Memo:       martParam.Memo,
-	}); err != nil {
-		common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
-		return 0, common.ErrMartParamKey
-	}
+	// if err = martB.Init(&protos.MartParamModel{
+	// 	MartDomain: martParam.MartDomain,
+	// 	AccessKey:  martParam.AccessKey,
+	// 	SecretKey:  martParam.SecretKey,
+	// 	Passphrase: martParam.Passphrase,
+	// 	Memo:       martParam.Memo,
+	// }); err != nil {
+	// 	common.Logger.Error("martA.Init ERR: ", zap.Any("bot", m))
+	// 	return 0, common.ErrMartParamKey
+	// }
 
-	r, err = repos.BotRepo.UpdateIsRun(sessionUser.UID, botId, protos.BotIsRunning)
-	if err != nil {
-		logger.Error("Run ERR: ", zap.Error(err))
-		return 0, common.ErrService
-	}
+	// r, err = repos.BotRepo.UpdateIsRun(sessionUser.UID, botId, protos.BotIsRunning)
+	// if err != nil {
+	// 	logger.Error("Run ERR: ", zap.Error(err))
+	// 	return 0, common.ErrService
+	// }
 
-	// 停掉正在运行的机器人
-	channels.PostBotTask(&protos.BotTaskEvent{
-		Method: protos.BotTaskRun,
-		Uid:    sessionUser.UID,
-		BotID:  botId,
-	})
+	// // 停掉正在运行的机器人
+	// channels.PostBotTask(&protos.BotTaskEvent{
+	// 	Method: protos.BotTaskRun,
+	// 	Uid:    sessionUser.UID,
+	// 	BotID:  botId,
+	// })
 
-	log := &protos.BusinessLog{
-		UserName:     sessionUser.Nickname.String,
-		BusinessType: protos.BUSINESS_TYPE_START_BOT,
-		Payload:      fmt.Sprintf("%v", botId),
-	}
-	log.UserId = sessionUser.UID
-	log.TenantId = sessionUser.TenantID
-	BusinessLogService.Add(log)
+	// log := &protos.BusinessLog{
+	// 	UserName:     sessionUser.Nickname.String,
+	// 	BusinessType: protos.BUSINESS_TYPE_START_BOT,
+	// 	Payload:      fmt.Sprintf("%v", botId),
+	// }
+	// log.UserId = sessionUser.UID
+	// log.TenantId = sessionUser.TenantID
+	// BusinessLogService.Add(log)
 
 	return
 }

@@ -1,11 +1,11 @@
 package service
 
 import (
-	"arbitrage/channels"
-	"arbitrage/common"
-	"arbitrage/protos"
 	"fmt"
 	"math/rand"
+	"pcdn-server/channels"
+	"pcdn-server/common"
+	"pcdn-server/protos"
 	"strings"
 	"time"
 

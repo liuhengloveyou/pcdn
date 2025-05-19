@@ -2,6 +2,7 @@ package protos
 
 import (
 	"database/sql/driver"
+	"net"
 
 	passport "github.com/liuhengloveyou/passport/protos"
 
@@ -21,7 +22,7 @@ type PageResponse struct {
 	List  interface{} `json:"list"`
 }
 
-type UserLiteArr []passport.UserLite
+type UserLiteArr []passport.User
 
 func (m *UserLiteArr) Scan(src interface{}) error {
 	if src == nil {
@@ -91,4 +92,45 @@ func (t *MapStringInt) Scan(src interface{}) error {
 }
 func (t MapStringInt) Value() (driver.Value, error) {
 	return sonic.Marshal(t)
+}
+
+type TaskStruct struct {
+	Name     string `json:"name"`
+	TaskId   string `json:"id"`
+	TaskType string `json:"type"`
+	Payload  string `json:"payload,omitempty"`
+	HostName string `json:"hostname,omitempty"`
+	Port     string `json:"port,omitempty"`
+
+	RespChan chan *TaskResp `json:"-"`
+}
+
+type TaskReq struct {
+	Name string `json:"name"`
+}
+
+type TaskResp struct {
+	Name     string `json:"name"`
+	TaskId   string `json:"id"`
+	TaskType string `json:"type"`
+	Resp     string `json:"resp"`
+}
+
+type HeartbeatReq struct {
+	Name   string `json:"name"`
+	Time   string `json:"time"`
+	Stat   string `json:"stat"`
+	Remark string `json:"remark"`
+}
+
+type AgentClient struct {
+	Name       string `json:"name"`
+	Ip         string `json:"ip"`
+	RemoteAddr string `json:"remoteAddr"`
+	Time       string `json:"time"`
+	Remark     string `json:"remark"`
+	// Stat       string `json:"stat"`
+
+	NcConn *net.Conn              `json:"-"`
+	Tasks  map[string]*TaskStruct `json:"-"`
 }

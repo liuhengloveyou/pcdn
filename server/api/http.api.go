@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"arbitrage/common"
+	"pcdn-server/common"
 
 	gocommon "github.com/liuhengloveyou/go-common"
 	passport "github.com/liuhengloveyou/passport/face"
@@ -40,55 +40,14 @@ func init() {
 		},
 	}
 
-	// 配置机器人
-	Apis["/bot/set"] = ApiStruct{
-		Handler:   SetOneBot,
-		NeedLogin: true,
-	}
-	Apis["/bot/load"] = ApiStruct{
-		Handler:   LoadMyBot,
-		NeedLogin: true,
-	}
-	Apis["/bot/take"] = ApiStruct{
-		Handler:   LoadOneMyBot,
-		NeedLogin: true,
-	}
-	Apis["/bot/del"] = ApiStruct{
-		Handler:   DeleteOneMyBot,
-		NeedLogin: true,
-	}
-	Apis["/bot/run"] = ApiStruct{
-		Handler:   RunMyBot,
-		NeedLogin: true,
-	}
-	Apis["/bot/stop"] = ApiStruct{
-		Handler:   StopMyBot,
-		NeedLogin: true,
+	// 设备管理接口
+	Apis["/device/list"] = ApiStruct{
+		Handler:   ListDevices,
+		NeedLogin: false,
 	}
 
-	// 配置交易所
-	Apis["/mart/set"] = ApiStruct{
-		Handler:   SetMartParam,
-		NeedLogin: true,
-	}
-	Apis["/mart/load"] = ApiStruct{
-		Handler:   LoadMyMartParam,
-		NeedLogin: true,
-	}
-	Apis["/mart/loadlite"] = ApiStruct{
-		Handler:   LoadMyMartParamLite,
-		NeedLogin: true,
-	}
-	Apis["/mart/take"] = ApiStruct{
-		Handler:   LoadOneMyMartParam,
-		NeedLogin: true,
-	}
-	Apis["/mart/active"] = ApiStruct{
-		Handler:   ActiveMyMartParam,
-		NeedLogin: true,
-	}
-	Apis["/mart/del"] = ApiStruct{
-		Handler:   DeleteMyMartParam,
+	Apis["/device/update"] = ApiStruct{
+		Handler:   UpdateAgent,
 		NeedLogin: true,
 	}
 
@@ -96,16 +55,16 @@ func init() {
 	initOrderApi()
 	initKlineApi()
 	initBusinessLogApi()
-	initSpotApi()
 	initVIPApi()
-	initAdminApi()
 }
 
 func InitAndRunHttpApi(addr string) error {
 	// http.HandleFunc("/ws", ws.WebsocketHandler)
 	passport.InitAndRunHttpApi(nil)
 
-	http.Handle("/", &HttpServer{})
+	http.Handle("/", &HttpApiServer{})
+	// http.Handle("/", http.FileServer(http.Dir("www")))
+
 	s := &http.Server{
 		Addr:           addr,
 		ReadTimeout:    10 * time.Minute,
@@ -121,19 +80,16 @@ func InitAndRunHttpApi(addr string) error {
 	return nil
 }
 
-type HttpServer struct{}
+type HttpApiServer struct{}
 
-func (p *HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *HttpApiServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	origin := r.Header.Get("Origin") //请求头部
 	if origin != "" {
-		// 当Access-Control-Allow-Credentials为true时，将*替换为指定的域名
 		w.Header().Add("Access-Control-Allow-Origin", origin)
 		w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
 		w.Header().Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, X-Extra-Header, Content-Type, Accept, Authorization")
 		w.Header().Add("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		// w.Header().Add("Access-Control-Max-Age", "86400")  // 可选
-		// r.Header.Set("content-type", "application/json") // 可选
 	}
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusNoContent)
@@ -145,7 +101,7 @@ func (p *HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		URL, _ := url.Parse(r.RequestURI)
 		apiName = URL.Path
 	}
-	// fmt.Println("api: ", apiName)
+	fmt.Println("api: ", apiName)
 
 	if apiName == "" {
 		Logger.Warnf("api not found: %v\n", apiName)
@@ -185,13 +141,14 @@ func ReadSessionFromRequest(r *http.Request) (sessionUser *passportprotos.User) 
 		return &sessionUserJson.Data
 	}
 
-	sessUser := passport.GetSessionUser(r)
-	if sessUser.UID <= 0 {
-		Logger.Errorf("passport.GetSessionUser ERR: %#v\n", sessUser)
-		return
-	}
+	// sessUser := passport.GetSessionUser(r)
+	// if sessUser.UID <= 0 {
+	// 	Logger.Errorf("passport.GetSessionUser ERR: %#v\n", sessUser)
+	// 	return
+	// }
 
-	return &sessUser
+	// return &sessUser
+	return nil
 }
 
 func uploadImgByForm(w http.ResponseWriter, r *http.Request) {

@@ -1,8 +1,8 @@
 package repos
 
 import (
-	"arbitrage/common"
-	"arbitrage/protos"
+	"pcdn-server/common"
+	"pcdn-server/protos"
 	"time"
 )
 
