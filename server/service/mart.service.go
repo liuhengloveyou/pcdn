@@ -1,12 +1,11 @@
 package service
 
 import (
-	"arbitrage/common"
-	"arbitrage/marts"
-	"arbitrage/protos"
 	"context"
 	"fmt"
-	"time"
+
+	"pcdn-server/common"
+	"pcdn-server/protos"
 
 	"github.com/bytedance/sonic"
 	passportprotos "github.com/liuhengloveyou/passport/protos"
@@ -98,45 +97,45 @@ func (s *martService) NewOrder(sessionUser *passportprotos.User, prop *protos.Or
 		return common.ErrParam
 	}
 
-	mart := marts.GetMartByName(prop.MartDomain)
-	common.Logger.Info("martService.NewOrder: ",
-		zap.Uint64("uid", sessionUser.UID),
-		zap.Uint64("uid", sessionUser.UID),
-		zap.Any("prop", prop),
-		zap.Any("param", martParam),
-		zap.Any("mart", mart))
-	if mart == nil {
-		return common.ErrService
-	}
-	err = mart.Init(martParam)
-	if err != nil {
-		common.Logger.Error("martService.NewOrder: ",
-			zap.Uint64("uid", sessionUser.UID),
-			zap.Uint64("uid", sessionUser.UID),
-			zap.Any("prop", prop),
-			zap.Any("param", martParam),
-			zap.Error(err))
-		return err
-	}
+	// mart := marts.GetMartByName(prop.MartDomain)
+	// common.Logger.Info("martService.NewOrder: ",
+	// 	zap.Uint64("uid", sessionUser.UID),
+	// 	zap.Uint64("uid", sessionUser.UID),
+	// 	zap.Any("prop", prop),
+	// 	zap.Any("param", martParam),
+	// 	zap.Any("mart", mart))
+	// if mart == nil {
+	// 	return common.ErrService
+	// }
+	// err = mart.Init(martParam)
+	// if err != nil {
+	// 	common.Logger.Error("martService.NewOrder: ",
+	// 		zap.Uint64("uid", sessionUser.UID),
+	// 		zap.Uint64("uid", sessionUser.UID),
+	// 		zap.Any("prop", prop),
+	// 		zap.Any("param", martParam),
+	// 		zap.Error(err))
+	// 	return err
+	// }
 
-	_, err = mart.NewOrder(&protos.OrderProp{
-		Symbol:        prop.Symbol,
-		Side:          protos.ORDER_SIDE_BUY,
-		Type:          protos.ORDER_TYPE_LIMIT,
-		ClientOrderId: fmt.Sprintf("%v", time.Now().UnixMilli()),
-		Quantity:      prop.Quantity,
-		Price:         prop.Price,
-		Notional:      prop.Notional,
-	})
-	common.Logger.Info("martService.NewOrder: ",
-		zap.Uint64("uid", sessionUser.UID),
-		zap.Uint64("uid", sessionUser.UID),
-		zap.Any("prop", prop),
-		zap.Any("param", martParam),
-		zap.Error(err))
-	if err != nil {
-		return common.ErrService
-	}
+	// _, err = mart.NewOrder(&protos.OrderProp{
+	// 	Symbol:        prop.Symbol,
+	// 	Side:          protos.ORDER_SIDE_BUY,
+	// 	Type:          protos.ORDER_TYPE_LIMIT,
+	// 	ClientOrderId: fmt.Sprintf("%v", time.Now().UnixMilli()),
+	// 	Quantity:      prop.Quantity,
+	// 	Price:         prop.Price,
+	// 	Notional:      prop.Notional,
+	// })
+	// common.Logger.Info("martService.NewOrder: ",
+	// 	zap.Uint64("uid", sessionUser.UID),
+	// 	zap.Uint64("uid", sessionUser.UID),
+	// 	zap.Any("prop", prop),
+	// 	zap.Any("param", martParam),
+	// 	zap.Error(err))
+	// if err != nil {
+	// 	return common.ErrService
+	// }
 
 	return nil
 }

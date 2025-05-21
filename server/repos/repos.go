@@ -1,7 +1,7 @@
 package repos
 
 import (
-	"arbitrage/protos"
+	"pcdn-server/protos"
 
 	"gorm.io/gorm"
 )

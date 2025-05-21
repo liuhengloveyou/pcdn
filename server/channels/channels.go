@@ -1,6 +1,6 @@
 package channels
 
-import "arbitrage/protos"
+import "pcdn-server/protos"
 
 var (
 	// 买VIP会员成功支付后， 发消息过来

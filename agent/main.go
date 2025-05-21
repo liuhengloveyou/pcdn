@@ -1,85 +1,101 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"fmt"
-	"io"
-	"net"
 	"os"
-	"os/exec"
+	"os/signal"
+	"syscall"
 	"time"
-	"strings"
-	"net/http"
+
+	"github.com/liuhengloveyou/go-selfupdate/selfupdate"
 )
 
-func main() {
-	serverAddr := "127.0.0.1:9000" // 替换为你的服务器地址
-	conn, err := net.Dial("tcp", serverAddr)
-	if err != nil {
-		fmt.Println("连接服务器失败:", err)
-		return
-	}
-	defer conn.Close()
+var (
+	Version   string
+	BuildTime string
+	CommitID  string
 
-	go sendHeartbeat(conn)
+	Sig string
 
-	reader := bufio.NewReader(conn)
-	for {
-		msg, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println("服务器关闭连接")
-			} else {
-				fmt.Println("读取数据失败:", err)
-			}
-			break
-		}
-		msg = strings.TrimSpace(msg)
-		fmt.Println("收到指令:", msg)
-		if strings.HasPrefix(msg, "upgrade ") {
-			url := strings.TrimPrefix(msg, "upgrade ")
-			upgradeSelf(url)
-		}
-	}
+	showVer   = flag.Bool("version", false, "打印版本号")
+	initSys   = flag.Bool("init", false, "初始化系统")
+	tcpServer = flag.String("tcp_server", "127.0.0.1:10001", "tcp服务地址")
+)
+
+// go-selfupdate setup and config
+var updater = &selfupdate.Updater{
+	CurrentVersion:     Version,                         // 手动更新常量，或使用 `go build -ldflags="-X main.VERSION=<newver>" -o hello-updater src/hello-updater/main.go` 设置
+	ApiURL:             "http://localhost:10000/update", // 托管 `$CmdName/$GOOS-$ARCH.json` 的服务器地址，该文件包含二进制文件的校验和
+	BinURL:             "http://localhost:10000/update", // 托管二进制应用压缩包的服务器地址，作为补丁方法的备用
+	DiffURL:            "http://localhost:10000/update", // 托管二进制补丁差异的服务器地址，用于增量更新
+	Dir:                "updated/",                      // 应用运行时创建的目录，用于存储 cktime 文件
+	CmdName:            "agent",                         // 应用名称，会附加到 ApiURL 后用于查找更新
+	ForceCheck:         true,                            // 对于此示例，除非版本为 "dev"，否则始终检查更新
+	OnSuccessfulUpdate: onUpdated,
 }
 
-func sendHeartbeat(conn net.Conn) {
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
-	for {
-		_, err := conn.Write([]byte("heartbeat\n"))
-		if err != nil {
-			fmt.Println("心跳发送失败:", err)
-			return
-		}
-		<-ticker.C
-	}
-}
+func onUpdated() {
+	fmt.Println("Successfully updated. please restart...")
 
-func upgradeSelf(url string) {
-	fmt.Println("开始升级，下载:", url)
-	resp, err := http.Get(url)
-	if err != nil {
-		fmt.Println("下载失败:", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	file, err := os.Create("agent_new.exe")
-	if err != nil {
-		fmt.Println("创建新文件失败:", err)
-		return
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		fmt.Println("写入新文件失败:", err)
-		return
-	}
-
-	fmt.Println("下载完成，准备替换并重启...")
-	// Windows下替换自身可执行文件较为复杂，通常需要先启动新进程再退出当前进程
-	exec.Command("cmd", "/C", "timeout 1 && move /Y agent_new.exe agent.exe && start agent.exe && exit").Start()
 	os.Exit(0)
+}
+
+func sigHandler() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		s := <-c
+		Sig = "service is suspend ..."
+		fmt.Println("Got signal:", s)
+
+		// Perform any necessary cleanup here
+		// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		// defer cancel()
+		// if err := srv.Shutdown(ctx); err != nil {
+		// 	fmt.Printf("Server Shutdown: %v\n", err)
+		// }
+		os.Exit(0)
+		fmt.Println("Server exiting")
+	}()
+}
+
+func main() {
+	flag.Parse()
+	sigHandler()
+
+	if *showVer {
+		fmt.Printf("%s\t%s\n", Version, BuildTime)
+		return
+	}
+
+	if *initSys {
+		// InitSystemEnv()
+		return
+	}
+
+	// 启动的时候更新一次
+	if err := updater.BackgroundRun(); err != nil {
+		fmt.Println("Failed to update app:", err)
+	}
+
+	InitTasks()
+
+	if tcpServer == nil || *tcpServer == "" {
+		fmt.Println("tcp_server is nil")
+		return
+	}
+
+	go func() {
+		for {
+			if err := InitTcpClient(*tcpServer); err != nil {
+				fmt.Println(err)
+			}
+
+			time.Sleep(10 * time.Second)
+		}
+	}()
+
+	select {}
 }

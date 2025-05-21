@@ -1,8 +1,8 @@
 package service
 
 import (
-	"arbitrage/common"
-	"arbitrage/protos"
+	"pcdn-server/common"
+	"pcdn-server/protos"
 	"strings"
 
 	"go.uber.org/zap"

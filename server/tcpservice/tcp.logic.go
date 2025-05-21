@@ -1,25 +1,26 @@
 package tcpservice
 
 import (
-	"arbitrage/common"
 	"bufio"
 	"bytes"
-	"csmm/protos"
 	"fmt"
 	"time"
+
+	"pcdn-server/common"
+	"pcdn-server/protos"
 )
 
-func GetDevInfo(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func GetDevInfo(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_DEVINFO,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("SendTask: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("SendTask: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: %v\n", err)
 		return nil
@@ -28,17 +29,17 @@ func GetDevInfo(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func GetAppList(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func GetAppList(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_APPLIST,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("GetAppList: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("GetAppList: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -47,17 +48,17 @@ func GetAppList(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func GetProcessList(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func GetProcessList(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_PROCLIST,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("GetProcessList: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("GetProcessList: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -66,7 +67,7 @@ func GetProcessList(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func GetDir(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
+func GetDir(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -74,10 +75,10 @@ func GetDir(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 		Payload:  path,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -86,7 +87,7 @@ func GetDir(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func ChatMsg(csmmClient *protos.CsmmClient, chat string) *protos.TaskStruct {
+func ChatMsg(AgentClient *protos.AgentClient, chat string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -94,10 +95,10 @@ func ChatMsg(csmmClient *protos.CsmmClient, chat string) *protos.TaskStruct {
 		Payload:  chat,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("ChatMsg: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("ChatMsg: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("ChatMsg SendTask ERR: ", err)
 		return nil
@@ -106,17 +107,17 @@ func ChatMsg(csmmClient *protos.CsmmClient, chat string) *protos.TaskStruct {
 	return task
 }
 
-func Contact(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func Contact(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_CONTACT,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -125,17 +126,17 @@ func Contact(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func Calllog(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func Calllog(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_CALLLOG,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Calllog: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Calllog: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -144,17 +145,17 @@ func Calllog(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func MessageLog(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func MessageLog(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_MESSAGE,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("MessageLog: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("MessageLog: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -163,17 +164,18 @@ func MessageLog(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func Calendar(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+// 更新agent版本
+func UpdateAgent(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
-		TaskType: TASKTYPE_CALENDAR,
+		TaskType: TASKTYPE_UPDATE,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Calendar: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Calendar: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -182,17 +184,17 @@ func Calendar(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func Internet(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func Internet(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_INTERNET,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Internet: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Internet: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -201,17 +203,17 @@ func Internet(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func Gps(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func Gps(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_GPS,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Gps: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Gps: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Gps SendTask ERR: ", err)
 		return nil
@@ -220,17 +222,17 @@ func Gps(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func NetLink(csmmClient *protos.CsmmClient) *protos.TaskStruct {
+func NetLink(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_NetLink,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("NetLink: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("NetLink: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("NetLink SendTask ERR: ", err)
 		return nil
@@ -239,20 +241,19 @@ func NetLink(csmmClient *protos.CsmmClient) *protos.TaskStruct {
 	return task
 }
 
-func ScreenLive(csmmClient *protos.CsmmClient, sessionId string) (task *protos.TaskStruct, err error) {
+func ScreenLive(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_SCREENLIVE,
-		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, common.ServConfig.RtpPort),
-		SSRC:     sessionId,
+		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err = SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("SendTask ScreenLive: %#v %v %v\n", csmmClient, task, err)
+	err = SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("SendTask ScreenLive: %#v %v %v\n", AgentClient, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ScreenLive ERR: ", err)
 		return
@@ -261,19 +262,18 @@ func ScreenLive(csmmClient *protos.CsmmClient, sessionId string) (task *protos.T
 	return
 }
 
-func VideoLive(csmmClient *protos.CsmmClient, videoNum, sessionId string) (task *protos.TaskStruct, err error) {
+func VideoLive(AgentClient *protos.AgentClient, videoNum, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: videoNum,
-		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, common.ServConfig.RtpPort),
-		SSRC:     sessionId,
+		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err = SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("VideoLive SendTask: %#v %v %v\n", csmmClient, task, err)
+	err = SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("VideoLive SendTask: %#v %v %v\n", AgentClient, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("VideoLive SendTask ERR: ", err)
 		return
@@ -282,19 +282,18 @@ func VideoLive(csmmClient *protos.CsmmClient, videoNum, sessionId string) (task 
 	return
 }
 
-func SwitchCamera(csmmClient *protos.CsmmClient, sessionId string) (task *protos.TaskStruct, err error) {
+func SwitchCamera(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_SWITCHCAMERA,
-		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, common.ServConfig.RtpPort),
-		SSRC:     sessionId,
+		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err = SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("SwitchCamera SendTask: %#v %v %v\n", csmmClient, task, err)
+	err = SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("SwitchCamera SendTask: %#v %v %v\n", AgentClient, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SwitchCamera SendTask ERR: ", err)
 		return
@@ -303,19 +302,18 @@ func SwitchCamera(csmmClient *protos.CsmmClient, sessionId string) (task *protos
 	return
 }
 
-func AudioLive(csmmClient *protos.CsmmClient, sessionId string) (task *protos.TaskStruct, err error) {
+func AudioLive(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_AUDIOLIVE,
-		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, common.ServConfig.RtpPort),
-		SSRC:     sessionId,
+		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err = SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("AudioLive SendTask: %#v %v %v\n", csmmClient, task, err)
+	err = SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("AudioLive SendTask: %#v %v %v\n", AgentClient, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("AudioLive SendTask ERR: ", err)
 		return
@@ -324,7 +322,7 @@ func AudioLive(csmmClient *protos.CsmmClient, sessionId string) (task *protos.Ta
 	return
 }
 
-func Remark(csmmClient *protos.CsmmClient, remark string) *protos.TaskStruct {
+func Remark(AgentClient *protos.AgentClient, remark string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -332,19 +330,19 @@ func Remark(csmmClient *protos.CsmmClient, remark string) *protos.TaskStruct {
 		Payload:  remark,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Remark: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Remark: %#v %v\n", AgentClient, err)
 	if err != nil {
-		common.Logger.Sugar().Errorf("Remark ERR: ", csmmClient, err)
+		common.Logger.Sugar().Errorf("Remark ERR: ", AgentClient, err)
 		return nil
 	}
 
 	return task
 }
 
-func ShellCmd(csmmClient *protos.CsmmClient, cmd string) *protos.TaskStruct {
+func ShellCmd(AgentClient *protos.AgentClient, cmd string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -352,10 +350,10 @@ func ShellCmd(csmmClient *protos.CsmmClient, cmd string) *protos.TaskStruct {
 		Payload:  cmd,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("ShellCmd SendTask: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("ShellCmd SendTask: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("ShellCmd ERR: %v\n", err)
 		return nil
@@ -364,7 +362,7 @@ func ShellCmd(csmmClient *protos.CsmmClient, cmd string) *protos.TaskStruct {
 	return task
 }
 
-func Download(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
+func Download(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -373,10 +371,10 @@ func Download(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 		Payload:  path,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Download ERR: %v\n", err)
 		return nil
@@ -385,7 +383,7 @@ func Download(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func Upload(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
+func Upload(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
@@ -394,10 +392,10 @@ func Upload(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 		Payload:  path,
 		RespChan: make(chan *protos.TaskResp, 1),
 	}
-	csmmClient.Tasks[taskId] = task
+	AgentClient.Tasks[taskId] = task
 
-	err := SendTask(csmmClient, task)
-	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", csmmClient, err)
+	err := SendTask(AgentClient, task)
+	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", AgentClient, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Download ERR: %v\n", err)
 		return nil
@@ -406,19 +404,19 @@ func Upload(csmmClient *protos.CsmmClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func sendCommandByNc(csmmClient *protos.CsmmClient, cmd string) string {
+func sendCommandByNc(AgentClient *protos.AgentClient, cmd string) string {
 	for {
-		if csmmClient.NcConn == nil {
-			addShellTask(csmmClient)
+		if AgentClient.NcConn == nil {
+			addShellTask(AgentClient)
 			time.Sleep(time.Second)
 			continue
 		}
-		conn := *csmmClient.NcConn
+		conn := *AgentClient.NcConn
 
 		_, err := conn.Write([]byte(cmd))
 		if err != nil {
 			conn.Close()
-			csmmClient.NcConn = nil
+			AgentClient.NcConn = nil
 			return ""
 		}
 
@@ -441,18 +439,18 @@ func sendCommandByNc(csmmClient *protos.CsmmClient, cmd string) string {
 	}
 }
 
-func addShellTask(csmmClient *protos.CsmmClient) {
+func addShellTask(AgentClient *protos.AgentClient) {
 	// has := false
 
-	// for i := 0; i < len(csmmClient.Tasks); i++ {
-	// 	if strings.Compare(csmmClient.Tasks[i].TaskType, "shell") == 0 {
+	// for i := 0; i < len(AgentClient.Tasks); i++ {
+	// 	if strings.Compare(AgentClient.Tasks[i].TaskType, "shell") == 0 {
 	// 		has = true
 	// 		break
 	// 	}
 	// }
 
 	// if has == false {
-	// 	csmmClient.Tasks = append(csmmClient.Tasks, protos.TaskStruct{
+	// 	AgentClient.Tasks = append(AgentClient.Tasks, protos.TaskStruct{
 	// 		TaskId:   time.Now().Format("2006-01-02 15:04:05"),
 	// 		TaskType: "shell",
 	// 		HostName: "csmm.feitian.link",

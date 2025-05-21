@@ -1,0 +1,18 @@
+2025-05-19 15:29:28.936	info	common/common.go:104	initLog OK
+
+2025-05-19 15:29:59.409	info	common/common.go:104	initLog OK
+
+2025-05-19 15:30:13.035	info	common/common.go:105	initLog OK
+
+2025-05-19 15:36:47.350	error	tcpservice/tcp.service.go:246	read client ERR: 127.0.0.1:41438 EOF
+
+2025-05-19 15:38:48.538	info	common/common.go:105	initLog OK
+
+2025-05-19 15:41:00.522	info	common/common.go:105	initLog OK
+
+2025-05-19 15:43:21.438	info	common/common.go:105	initLog OK
+
+2025-05-19 15:48:17.830	error	tcpservice/tcp.service.go:246	read client ERR: 127.0.0.1:50378 EOF
+
+2025-05-19 15:54:30.234	error	tcpservice/tcp.service.go:246	read client ERR: 127.0.0.1:60890 EOF
+
