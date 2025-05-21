@@ -9,12 +9,12 @@ import (
 func InitTasks() {
 	c := cron.New(cron.WithSeconds())
 
-	_, err := c.AddFunc("*/1 * * * * *", func() {
-		fmt.Println("Every second")
-	})
-	if err != nil {
-		return
-	}
+	// _, err := c.AddFunc("*/1 * * * * *", func() {
+	// 	fmt.Println("Every second")
+	// })
+	// if err != nil {
+	// 	return
+	// }
 
 	// 定时更新
 	if _, err := c.AddFunc("1 1 1 * * *", func() {

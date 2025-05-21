@@ -21,6 +21,7 @@ import (
 
 type ApiStruct struct {
 	Handler    func(http.ResponseWriter, *http.Request)
+	Method     string
 	NeedLogin  bool
 	NeedAccess bool
 }
@@ -40,22 +41,8 @@ func init() {
 		},
 	}
 
-	// 设备管理接口
-	Apis["/device/list"] = ApiStruct{
-		Handler:   ListDevices,
-		NeedLogin: false,
-	}
-
-	Apis["/device/update"] = ApiStruct{
-		Handler:   UpdateAgent,
-		NeedLogin: true,
-	}
-
-	initRiskBotApi()
-	initOrderApi()
-	initKlineApi()
+	initDeviceManagerApi()
 	initBusinessLogApi()
-	initVIPApi()
 }
 
 func InitAndRunHttpApi(addr string) error {
@@ -114,7 +101,11 @@ func (p *HttpApiServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		gocommon.HttpErr(w, http.StatusMethodNotAllowed, -1, apiName)
 		return
 	}
-	// Logger.Debugf("api: %v %v %v\n", apiName, r.URL, apiHandler)
+
+	if apiHandler.Method != "" && apiHandler.Method != r.Method {
+		gocommon.HttpErr(w, http.StatusMethodNotAllowed, -1, "method not allowed")
+		return
+	}
 
 	if apiHandler.NeedLogin {
 		if ReadSessionFromRequest(r) == nil {

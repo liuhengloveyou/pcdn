@@ -15,6 +15,8 @@ require (
 	gorm.io/gorm v1.26.1
 )
 
+require google.golang.org/protobuf v1.36.6 // indirect
+
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Blank-Xu/sql-adapter v1.0.0 // indirect
@@ -39,6 +41,7 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lestrrat-go/strftime v1.1.0 // indirect
+	github.com/liuhengloveyou/pcdn/protos v0.0.0-00010101000000-000000000000
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1005 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms v1.0.1005 // indirect
@@ -54,4 +57,7 @@ require (
 	xorm.io/builder v0.3.13 // indirect
 )
 
-replace github.com/liuhengloveyou/passport v1.1.0 => ../../dev/passport/
+replace (
+	github.com/liuhengloveyou/passport => ../../dev/passport/
+	github.com/liuhengloveyou/pcdn/protos => ../protos/
+)

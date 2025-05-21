@@ -9,7 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"pcdn-server/protos"
+	"pcdn-server/models"
+
+	"github.com/liuhengloveyou/pcdn/protos"
 )
 
 // go test -v -count=1 ./... -run TestTcpTask
@@ -28,7 +30,7 @@ func ReadTcpTask(conn net.Conn) {
 	taskRepByte, _ := json.Marshal(taskRep)
 
 	buff := bytes.NewBuffer([]byte("\r\n"))
-	if err := binary.Write(buff, binary.LittleEndian, uint32(MSGTYPE_GETTASK)); err != nil {
+	if err := binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_HEARTBEAT)); err != nil {
 		panic(err)
 	}
 	if err := binary.Write(buff, binary.LittleEndian, uint32(len(taskRepByte))); err != nil {
@@ -66,7 +68,7 @@ func TestTcpHeartbeat(t *testing.T) {
 
 	go ReadTcpTask(conn)
 
-	req := protos.HeartbeatReq{
+	req := models.HeartbeatReq{
 		Name: "testing",
 		Stat: "idel",
 	}
@@ -76,7 +78,7 @@ func TestTcpHeartbeat(t *testing.T) {
 		reqByte, _ := json.Marshal(req)
 
 		buff := bytes.NewBuffer([]byte("\r\n"))
-		if err = binary.Write(buff, binary.LittleEndian, uint32(MSGTYPE_HEARTBEAT)); err != nil {
+		if err = binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_HEARTBEAT)); err != nil {
 			panic(err)
 		}
 		if err = binary.Write(buff, binary.LittleEndian, uint32(len(reqByte))); err != nil {

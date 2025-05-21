@@ -31,9 +31,9 @@ var (
 
 	ServConfig ConfigStruct
 
-	Logger *zap.Logger
-	OrmCli *gorm.DB
-	RDB    *redis.Client
+	Logger      *zap.Logger
+	OrmCli      *gorm.DB
+	RedisClient *redis.Client
 )
 
 type ConfigStruct struct {
@@ -42,7 +42,7 @@ type ConfigStruct struct {
 	HttpServerAddr string `yaml:"http_server_addr"`
 	TcpServerAddr  string `yaml:"tcp_server_addr"`
 	MysqlURN       string `yaml:"mysql_urn"`
-	Redis          string `yaml:"redis"`
+	RedisAddr      string `yaml:"redis_addr"`
 	UploadDir      string `yaml:"upload_dir"`
 	FileDir        string `yaml:"file_dir"`
 	LogDir         string `yaml:"log_dir"`
@@ -72,8 +72,8 @@ func init() {
 		}
 	}
 
-	if len(ServConfig.Redis) > 0 {
-		if e := InitRedis(ServConfig.Redis); e != nil {
+	if len(ServConfig.RedisAddr) > 0 {
+		if e := InitRedis(ServConfig.RedisAddr); e != nil {
 			panic(e)
 		}
 	}
@@ -132,14 +132,22 @@ func InitGorm(dsn string) (e error) {
 	return
 }
 
-func InitRedis(addr string) (e error) {
-	RDB = redis.NewClient(&redis.Options{
-		Addr:     addr,
+func InitRedis(redisAddr string) (e error) {
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 
-	return RDB.Ping(context.Background()).Err()
+	// 测试连接
+	e = RedisClient.Ping(context.Background()).Err()
+	if e != nil {
+		Logger.Sugar().Errorf("连接Redis失败: %v", e)
+		RedisClient = nil
+		return
+	}
+
+	return nil
 }
 
 func IsNowOpenningTime(timeArr []string) bool {

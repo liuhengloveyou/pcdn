@@ -11,11 +11,9 @@ import (
 var Logger *zap.Logger
 
 func init() {
-
-	if e := InitLog("./log/", "debug"); e != nil {
+	if e := InitLog("./logs/", "debug"); e != nil {
 		panic(e)
 	}
-
 }
 
 func InitLog(logDir, logLevel string) error {

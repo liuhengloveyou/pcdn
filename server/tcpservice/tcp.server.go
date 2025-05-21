@@ -3,235 +3,40 @@ package tcpservice
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 
 	"pcdn-server/common"
-	"pcdn-server/protos"
+	"pcdn-server/models"
+
+	"github.com/liuhengloveyou/pcdn/protos"
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 )
 
-const (
-	HEARTBEAT_STAT_IDLE = "idle"
-	HEARTBEAT_STAT_RUN  = "run"
-)
+var AgentMap map[string]*models.DeviceModel = make(map[string]*models.DeviceModel)
 
-const (
-	MSGTYPE_HEARTBEAT uint32 = 1
-	MSGTYPE_GETTASK   uint32 = 2
-	MSGTYPE_TASK      uint32 = 3
-	MSGTYPE_TASKRESP  uint32 = 4
-)
-
-const (
-	TASKTYPE_UPDATE string = "update"
-
-	TASKTYPE_DEVINFO  string = "devinfo"
-	TASKTYPE_APPLIST  string = "applist"
-	TASKTYPE_PROCLIST string = "proclist"
-	TASKTYPE_DIR      string = "dir"
-	TASKTYPE_CONTACT  string = "contact"
-	TASKTYPE_CALLLOG  string = "calllog"
-	TASKTYPE_MESSAGE  string = "message"
-
-	TASKTYPE_INTERNET     string = "internet"
-	TASKTYPE_GPS          string = "gpsinfo"
-	TASKTYPE_SCREENLIVE   string = "screenlive"
-	TASKTYPE_VIDEOLIVE    string = "videolive"
-	TASKTYPE_VIDEOLIVE1   string = "videolive1"
-	TASKTYPE_SWITCHCAMERA string = "switchcamera"
-	TASKTYPE_AUDIOLIVE    string = "audiolive"
-	TASKTYPE_REMARK       string = "remark"
-	TASKTYPE_SHELL        string = "shell"
-	TASKTYPE_DOWNLOAD     string = "down"
-	TASKTYPE_UPLOAD       string = "upload"
-	TASKTYPE_NetLink      string = "netlink"
-	TASKTYPE_CHAT         string = "chat"
-)
-
-var AgentMap map[string]*protos.AgentClient = make(map[string]*protos.AgentClient)
-
-func sendHeartbeatResp(conn net.Conn, msg *protos.HeartbeatReq) error {
-	if msg == nil {
-		return nil
-	}
-
-	respByte, err := json.Marshal(msg)
+func InitTcpService(addr string) {
+	listen, err := net.Listen("tcp", addr)
 	if err != nil {
-		return err
+		fmt.Println("listen failed,err", err)
+		return
 	}
 
-	buff := bytes.NewBuffer([]byte("\r\n"))
-	if err := binary.Write(buff, binary.LittleEndian, uint32(MSGTYPE_HEARTBEAT)); err != nil {
-		return err
-	}
-	if err := binary.Write(buff, binary.LittleEndian, uint32(len(respByte))); err != nil {
-		return err
-	}
-	if n, err := buff.Write(respByte); n != len(respByte) || err != nil {
-		return err
-	}
-
-	if n, err := conn.Write(buff.Bytes()); n != buff.Len() || err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func SendTask(csmm *protos.AgentClient, task *protos.TaskStruct) error {
-	for i := 0; i < 10 && csmm.NcConn == nil; i++ {
-		time.Sleep(time.Second)
-		continue // 通手机联上来取任务
-	}
-
-	if csmm.NcConn == nil {
-		return fmt.Errorf("下发任务超时")
-	}
-
-	conn := *csmm.NcConn
-
-	taskByte, err := json.Marshal(task)
-	if err != nil {
-		return err
-	}
-
-	buff := bytes.NewBuffer([]byte("\r\n"))
-	if err := binary.Write(buff, binary.LittleEndian, uint32(MSGTYPE_TASK)); err != nil {
-		return err
-	}
-	if err := binary.Write(buff, binary.LittleEndian, uint32(len(taskByte))); err != nil {
-		return err
-	}
-	if n, err := buff.Write(taskByte); n != len(taskByte) || err != nil {
-		return err
-	}
-
-	if n, err := conn.Write(buff.Bytes()); n != buff.Len() || err != nil {
-		conn.Close()
-		csmm.NcConn = nil // 重联
-		return err
-	}
-
-	return nil
-}
-
-func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
-	var req protos.HeartbeatReq
-	if err := json.Unmarshal(msgByte, &req); err != nil {
-		common.Logger.Sugar().Errorf("heartbeat err: ", string(msgByte), err)
-		return err
-	}
-	common.Logger.Sugar().Debugf("heartbeat: %#v\n", req)
-
-	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
-	tmpCsmm := AgentMap[req.Name]
-	if tmpCsmm == nil {
-		tmpCsmm = &protos.AgentClient{
-			Ip:     remoteAddr,
-			Name:   req.Name,
-			Remark: req.Remark,
-			Time:   req.Time,
-			Tasks:  make(map[string]*protos.TaskStruct),
+	for {
+		conn, err := listen.Accept()
+		if err != nil {
+			fmt.Println("accept failed: ", err)
+			continue
 		}
-		AgentMap[req.Name] = tmpCsmm
-	} else {
-		tmpCsmm.Name = req.Name
-		tmpCsmm.Remark = req.Remark
-		tmpCsmm.Ip = remoteAddr
-		tmpCsmm.Time = req.Time
+
+		go process(conn) // 去处理读取数据
 	}
-
-	if len(tmpCsmm.Tasks) > 0 {
-		return sendHeartbeatResp(conn, &protos.HeartbeatReq{
-			Name: req.Name,
-			Time: time.Now().Format("2006-01-02 15:04:05"),
-			Stat: HEARTBEAT_STAT_RUN,
-		})
-	} else {
-		return sendHeartbeatResp(conn, &protos.HeartbeatReq{
-			Name: req.Name,
-			Time: time.Now().Format("2006-01-02 15:04:05"),
-			Stat: HEARTBEAT_STAT_IDLE,
-		})
-	}
-}
-
-func processGetTaskMsg(conn net.Conn, msgByte []byte) error {
-	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
-
-	var req protos.TaskReq
-	if err := json.Unmarshal(msgByte, &req); err != nil {
-		common.Logger.Sugar().Errorf("processGetTaskMsg msg ERR: ", conn.RemoteAddr(), string(msgByte), err)
-		return err
-	}
-
-	csmm := AgentMap[req.Name]
-	if csmm == nil {
-		common.Logger.Sugar().Errorf("processGetTaskMsg ERR: %v %#v\n", remoteAddr, req, AgentMap)
-		return nil
-	}
-
-	common.Logger.Sugar().Info("processGetTaskMsg msg: ", conn.RemoteAddr(), string(msgByte))
-	csmm.NcConn = &conn
-
-	return nil
-}
-
-func processGetTaskRespMsg(conn net.Conn, msgByte []byte) {
-	common.Logger.Sugar().Debugf("processGetTaskRespMsg: %v %v\n", conn.RemoteAddr(), string(msgByte))
-
-	var resp protos.TaskResp
-	if err := json.Unmarshal(msgByte, &resp); err != nil {
-		common.Logger.Sugar().Errorf("processGetTaskRespMsg msg ERR: ", conn.RemoteAddr(), string(msgByte), err)
-		return
-	}
-
-	// remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
-	csmm := AgentMap[resp.Name]
-	if csmm == nil {
-		common.Logger.Sugar().Errorf("processGetTaskRespMsg csmm ERR: %v %v\n", conn.RemoteAddr(), string(msgByte))
-		return
-	}
-
-	task := csmm.Tasks[resp.TaskId]
-	if task == nil {
-		common.Logger.Sugar().Errorf("processGetTaskRespMsg task ERR: %v %v\n", conn.RemoteAddr(), string(msgByte))
-		return
-	}
-
-	taskId, _ := strconv.Atoi(task.TaskId)
-	respTaskId, _ := strconv.Atoi(resp.TaskId)
-	if respTaskId >= taskId {
-		go func() {
-			task.RespChan <- &resp
-			close(task.RespChan)
-			delete(csmm.Tasks, task.TaskId)
-		}()
-	} else {
-		// TODO
-	}
-}
-
-func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
-	switch msgType {
-	case MSGTYPE_HEARTBEAT:
-		return processHeartbeatMsg(conn, msgByte)
-	case MSGTYPE_GETTASK:
-		return processGetTaskMsg(conn, msgByte)
-	case MSGTYPE_TASKRESP:
-		processGetTaskRespMsg(conn, msgByte)
-	default:
-		common.Logger.Sugar().Debugf("processOneMsg type ERR: %v\n", msgType, string(msgByte))
-	}
-
-	// sendShellTask(conn, &req)
-
-	return nil
 }
 
 // 处理函数
@@ -282,20 +87,205 @@ func process(conn net.Conn) {
 	}
 }
 
-func InitTcpService(addr string) {
-	listen, err := net.Listen("tcp", addr)
-	if err != nil {
-		fmt.Println("listen failed,err", err)
-		return
+func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
+	switch msgType {
+	case uint32(protos.MsgType_MSG_TYPE_HEARTBEAT):
+		return processHeartbeatMsg(conn, msgByte)
+	// case MSGTYPE_GETTASK:
+	// 	return processGetTaskMsg(conn, msgByte)
+	// case MSGTYPE_TASKRESP:
+	// 	processGetTaskRespMsg(conn, msgByte)
+	default:
+		common.Logger.Error("processOneMsg type ERR: ", zap.Uint32("msgType", msgType))
 	}
 
-	for {
-		conn, err := listen.Accept()
-		if err != nil {
-			fmt.Println("accept failed: ", err)
-			continue
+	// sendShellTask(conn, &req)
+
+	return nil
+}
+
+func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
+	var req protos.Heartbeat
+	if err := proto.Unmarshal(msgByte, &req); err != nil {
+		common.Logger.Sugar().Errorf("heartbeat err: ", string(msgByte), err)
+		return err
+	}
+	common.Logger.Debug("heartbeat: ", zap.Any("req", req))
+
+	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
+	tmpDevice := AgentMap[req.Sn]
+	if tmpDevice == nil {
+		tmpDevice = &models.DeviceModel{
+			SN:         req.Sn,
+			Version:    req.Ver,
+			RemoteAddr: remoteAddr,
 		}
-
-		go process(conn) // 去处理读取数据
+		AgentMap[req.Sn] = tmpDevice
+	} else {
+		tmpDevice.SN = req.Sn
+		tmpDevice.Version = req.Ver
+		tmpDevice.RemoteAddr = remoteAddr
+		tmpDevice.Timestamp = req.Timestamp
+		tmpDevice.LastHeartbear = time.Now().UnixMilli()
 	}
+
+	// 更新Redis中的Agent状态
+	if err := updateAgentStatusToRedis(tmpDevice); err != nil {
+		common.Logger.Sugar().Errorf("更新Agent状态到Redis失败: %v", err)
+	}
+
+	sendHeartbeat(conn, &protos.Heartbeat{
+		Timestamp: time.Now().UnixMilli(),
+	})
+
+	return nil
+}
+
+func sendHeartbeat(conn net.Conn, msg *protos.Heartbeat) error {
+	if msg == nil {
+		return nil
+	}
+
+	msgByte, err := proto.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	buff := bytes.NewBuffer([]byte("\r\n"))
+	if err := binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_HEARTBEAT)); err != nil {
+		return err
+	}
+	if err := binary.Write(buff, binary.LittleEndian, uint32(len(msgByte))); err != nil {
+		return err
+	}
+	if n, err := buff.Write(msgByte); n != len(msgByte) || err != nil {
+		return err
+	}
+
+	if n, err := conn.Write(buff.Bytes()); n != buff.Len() || err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SendTask(csmm *protos.DeviceAgent, task *protos.TaskStruct) error {
+	// for i := 0; i < 10 && csmm.NcConn == nil; i++ {
+	// 	time.Sleep(time.Second)
+	// 	continue // 通手机联上来取任务
+	// }
+
+	// if csmm.NcConn == nil {
+	// 	return fmt.Errorf("下发任务超时")
+	// }
+
+	// conn := *csmm.NcConn
+
+	// taskByte, err := json.Marshal(task)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// buff := bytes.NewBuffer([]byte("\r\n"))
+	// if err := binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_HEARTBEAT)); err != nil {
+	// 	return err
+	// }
+	// if err := binary.Write(buff, binary.LittleEndian, uint32(len(taskByte))); err != nil {
+	// 	return err
+	// }
+	// if n, err := buff.Write(taskByte); n != len(taskByte) || err != nil {
+	// 	return err
+	// }
+
+	// if n, err := conn.Write(buff.Bytes()); n != buff.Len() || err != nil {
+	// 	conn.Close()
+	// 	csmm.NcConn = nil // 重联
+	// 	return err
+	// }
+
+	return nil
+}
+
+func processGetTaskMsg(conn net.Conn, msgByte []byte) error {
+	// remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
+
+	// var req protos.TaskReq
+	// if err := json.Unmarshal(msgByte, &req); err != nil {
+	// 	common.Logger.Sugar().Errorf("processGetTaskMsg msg ERR: ", conn.RemoteAddr(), string(msgByte), err)
+	// 	return err
+	// }
+
+	// csmm := AgentMap[req.Name]
+	// if csmm == nil {
+	// 	common.Logger.Sugar().Errorf("processGetTaskMsg ERR: %v %#v\n", remoteAddr, req, AgentMap)
+	// 	return nil
+	// }
+
+	// common.Logger.Sugar().Info("processGetTaskMsg msg: ", conn.RemoteAddr(), string(msgByte))
+	// csmm.NcConn = &conn
+
+	return nil
+}
+
+func processGetTaskRespMsg(conn net.Conn, msgByte []byte) {
+	common.Logger.Sugar().Debugf("processGetTaskRespMsg: %v %v\n", conn.RemoteAddr(), string(msgByte))
+
+	// var resp protos.TaskResp
+	// if err := json.Unmarshal(msgByte, &resp); err != nil {
+	// 	common.Logger.Sugar().Errorf("processGetTaskRespMsg msg ERR: ", conn.RemoteAddr(), string(msgByte), err)
+	// 	return
+	// }
+
+	// // remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
+	// csmm := AgentMap[resp.Name]
+	// if csmm == nil {
+	// 	common.Logger.Sugar().Errorf("processGetTaskRespMsg csmm ERR: %v %v\n", conn.RemoteAddr(), string(msgByte))
+	// 	return
+	// }
+
+	// task := csmm.Tasks[resp.TaskId]
+	// if task == nil {
+	// 	common.Logger.Sugar().Errorf("processGetTaskRespMsg task ERR: %v %v\n", conn.RemoteAddr(), string(msgByte))
+	// 	return
+	// }
+
+	// taskId, _ := strconv.Atoi(task.TaskId)
+	// respTaskId, _ := strconv.Atoi(resp.TaskId)
+	// if respTaskId >= taskId {
+	// 	go func() {
+	// 		task.RespChan <- &resp
+	// 		close(task.RespChan)
+	// 		delete(csmm.Tasks, task.TaskId)
+	// 	}()
+	// } else {
+	// 	// TODO
+	// }
+}
+
+func updateAgentStatusToRedis(agent *models.DeviceModel) error {
+	// 将Agent信息序列化为JSON
+	agentJSON, err := json.Marshal(agent)
+	if err != nil {
+		return fmt.Errorf("序列化Agent信息失败: %v", err)
+	}
+
+	// 使用Redis客户端将数据保存到Redis
+	// 使用agent的SN作为键
+	key := fmt.Sprintf("agent:%s", agent.SN)
+
+	// 设置数据到Redis，并设置过期时间（例如30分钟）
+	ctx := context.Background()
+	err = common.RedisClient.Set(ctx, key, string(agentJSON), 30*time.Minute).Err()
+	if err != nil {
+		return fmt.Errorf("保存Agent信息到Redis失败: %v", err)
+	}
+
+	// 同时更新一个集合，用于列出所有在线的Agent
+	// TODO 过期清理
+	err = common.RedisClient.SAdd(ctx, "agents:online", agent.SN).Err()
+	if err != nil {
+		common.Logger.Sugar().Warnf("更新在线Agent集合失败: %v", err)
+	}
+
+	return nil
 }

@@ -80,8 +80,6 @@ func main() {
 		fmt.Println("Failed to update app:", err)
 	}
 
-	InitTasks()
-
 	if tcpServer == nil || *tcpServer == "" {
 		fmt.Println("tcp_server is nil")
 		return
@@ -93,9 +91,11 @@ func main() {
 				fmt.Println(err)
 			}
 
-			time.Sleep(10 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 	}()
+
+	InitTasks()
 
 	select {}
 }

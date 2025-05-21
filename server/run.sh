@@ -1,8 +1,9 @@
 
 #!/usr/bin/env bash
 
-killall -9 server
+killall -9 pcdn-server &>/dev/null
+sleep 1
 
-./server &
+./pcdn-server &
 
 

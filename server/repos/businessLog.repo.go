@@ -2,19 +2,19 @@ package repos
 
 import (
 	"pcdn-server/common"
-	"pcdn-server/protos"
+	"pcdn-server/models"
 )
 
 type businessLogRepo struct {
 }
 
-func (p *businessLogRepo) Add(m *protos.BusinessLog) (uint64, error) {
+func (p *businessLogRepo) Add(m *models.BusinessLog) (uint64, error) {
 	tx := common.OrmCli.Create(m)
 
 	return m.Id, tx.Error
 }
 
-func (p *businessLogRepo) Find(uid uint64, martDomain string, page int) (rr []protos.BusinessLog, err error) {
+func (p *businessLogRepo) Find(uid uint64, martDomain string, page int) (rr []models.BusinessLog, err error) {
 	tx := common.OrmCli.Table("business_log")
 	tx = tx.Where("uid = ?", uid)
 

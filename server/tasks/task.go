@@ -3,12 +3,6 @@ package tasks
 import (
 	"sync"
 	"time"
-
-	"pcdn-server/channels"
-	"pcdn-server/common"
-	"pcdn-server/protos"
-
-	"go.uber.org/zap"
 )
 
 var (
@@ -34,20 +28,20 @@ func taskCycle() {
 			lastSyncTime = time.Now().Unix()
 		}
 
-		var ev *protos.BotTaskEvent
-		select {
-		case ev = <-channels.TaskCannel:
-			common.Logger.Debug("task/BotTaskEvent: ", zap.Any("ev", ev))
-		case <-time.After(time.Minute):
-			// nothing
-		}
+		// var ev *protos.BotTaskEvent
+		// select {
+		// case ev = <-channels.TaskCannel:
+		// 	common.Logger.Debug("task/BotTaskEvent: ", zap.Any("ev", ev))
+		// case <-time.After(time.Minute):
+		// 	// nothing
+		// }
 
-		common.Logger.Debug("task.ev ", zap.Any("ev: ", ev))
-		if ev != nil {
-			if ev.Method == protos.BotTaskStop {
-				// stopOneBotTask(fmt.Sprintf("%d-%d", ev.Uid, ev.BotID))
-			}
-		}
+		// common.Logger.Debug("task.ev ", zap.Any("ev: ", ev))
+		// if ev != nil {
+		// 	if ev.Method == protos.BotTaskStop {
+		// 		// stopOneBotTask(fmt.Sprintf("%d-%d", ev.Uid, ev.BotID))
+		// 	}
+		// }
 
 	}
 
