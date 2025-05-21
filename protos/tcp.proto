@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/liuhengloveyou/pcdn/protos";
+
+// 消息类型枚举
+enum MsgType {
+  MSG_TYPE_UNKNOWN = 0;     // 未知类型
+  MSG_TYPE_HEARTBEAT = 1;   // 心跳消息
+  MSG_TYPE_GET_TASK = 2;    // 获取任务
+  MSG_TYPE_TASK_RESP = 3;   // 任务响应
+}
+
+message Heartbeat {
+  string sn = 1;
+  string ver = 2;
+  int64 timestamp = 3;  // 添加时间戳字段，使用int64类型表示Unix时间戳
+}
+
+message DeviceAgent {
+  string sn = 1;
+  string ver = 2;
+  string remote_addr = 3;
+  int64 timestamp = 4; // 最后心跳带上来的时间
+  int64 last_heartbear = 5; // 最后心跳时间
+}
+
+
+// 任务结构体
+message TaskStruct {
+  string name = 1;
+  string task_id = 2;
+  string task_type = 3;
+  string payload = 4;
+  string host_name = 5;
+  string port = 6;
+  // RespChan字段被省略，因为它是一个通道类型，不适合在protobuf中表示
+}
+
+// 任务请求
+message TaskReq {
+  string name = 1;
+}
+
+// 任务响应
+message TaskResp {
+  string name = 1;
+  string task_id = 2;
+  string task_type = 3;
+  string resp = 4;
+}
