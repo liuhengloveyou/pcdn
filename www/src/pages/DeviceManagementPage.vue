@@ -1,152 +1,137 @@
 <template>
-  <q-page padding>
-    <div class="q-pa-md">
-      <div class="row q-col-gutter-md q-mb-md">
-        <!-- 搜索和添加按钮区域 -->
-        <div class="col-12">
-          <q-card flat bordered>
-            <q-card-section>
-              <div class="row q-col-gutter-md items-center">
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                  <q-input
-                    v-model="searchText"
-                    label="设备名称/ID搜索"
-                    dense
-                    outlined
-                    clearable
-                    @keyup.enter="onSearch"
-                  >
-                    <template v-slot:append>
-                      <q-icon name="search" @click="onSearch" class="cursor-pointer" />
-                    </template>
-                  </q-input>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                  <q-select
-                    v-model="statusFilter"
-                    :options="statusOptions"
-                    label="设备状态"
-                    dense
-                    outlined
-                    emit-value
-                    map-options
-                    clearable
-                  />
-                </div>
-                <div class="col-md-6 col-sm-12 col-xs-12 text-right">
-                  <q-btn color="primary" icon="add" label="添加设备" @click="openAddDialog" />
-                </div>
+  <q-page class="q-pa-sm">
+    <div class="row q-col-gutter-md">
+      <!-- 搜索和添加按钮区域 -->
+      <div class="col-12">
+        <q-card flat bordered>
+          <q-card-section style="padding: 0">
+            <div class="row q-col-gutter-md items-center">
+              <div class="col-md-3 col-sm-6 col-xs-12">
+                <q-input
+                  v-model="searchText"
+                  label="设备名称/ID搜索"
+                  dense
+                  outlined
+                  clearable
+                  @keyup.enter="onLoad"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" @click="onLoad" class="cursor-pointer" />
+                  </template>
+                </q-input>
               </div>
-            </q-card-section>
-          </q-card>
-        </div>
-
-        <!-- 数据表格区域 -->
-        <div class="col-12">
-          <q-card flat bordered>
-            <q-card-section>
-              <q-table
-                :rows="devices"
-                :columns="columns as QTableColumn[]"
-                row-key="id"
-                :loading="loading"
-                :pagination.sync="pagination"
-                :filter="searchText"
-                binary-state-sort
-              >
-                <template v-slot:body="props">
-                  <q-tr :props="props">
-                    <q-td key="id" :props="props">{{ props.row.id }}</q-td>
-                    <q-td key="name" :props="props">{{ props.row.name }}</q-td>
-                    <q-td key="type" :props="props">{{ props.row.type }}</q-td>
-                    <q-td key="status" :props="props">
-                      <q-chip :color="getStatusColor(props.row.status)" text-color="white" dense>
-                        {{ props.row.status }}
-                      </q-chip>
-                    </q-td>
-                    <q-td key="ip" :props="props">{{ props.row.ip }}</q-td>
-                    <q-td key="lastOnline" :props="props">{{ props.row.lastOnline }}</q-td>
-                    <q-td key="actions" :props="props">
-                      <q-btn
-                        flat
-                        round
-                        dense
-                        color="primary"
-                        icon="edit"
-                        @click="editDevice(props.row)"
-                      />
-                      <q-btn
-                        flat
-                        round
-                        dense
-                        color="negative"
-                        icon="delete"
-                        @click="confirmDelete(props.row)"
-                      />
-                      <q-btn
-                        flat
-                        round
-                        dense
-                        color="info"
-                        icon="visibility"
-                        @click="viewDeviceDetails(props.row)"
-                      />
-                    </q-td>
-                  </q-tr>
-                </template>
-              </q-table>
-            </q-card-section>
-          </q-card>
-        </div>
+              <div class="col-md-3 col-sm-6 col-xs-12">
+                <q-select
+                  v-model="statusFilter"
+                  :options="statusOptions"
+                  label="设备状态"
+                  dense
+                  outlined
+                  emit-value
+                  map-options
+                  clearable
+                />
+              </div>
+              <div class="col-md-6 col-sm-12 col-xs-12 text-right">
+                <q-btn color="primary" icon="add" label="添加设备" @click="openAddDialog" />
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
       </div>
+
+      <!-- 数据表格区域 -->
+      <q-card flat style="flex: 1; display: flex; flex-direction: column">
+        <q-card-section style="padding: 0">
+          <q-table
+            flat
+            hide-bottom
+            :rows="devices"
+            :columns="columns"
+            row-key="id"
+            :loading="loading"
+            :filter="searchText"
+            virtual-scroll
+          >
+            <template v-slot:body="props">
+              <q-tr :props="props">
+                <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+                <q-td key="sn" :props="props">{{ props.row.sn }}</q-td>
+
+                <q-td key="status" :props="props">
+                  <q-chip :color="getStatusColor(props.row.status)" text-color="white" dense>
+                    {{ props.row.status }}
+                  </q-chip>
+                </q-td>
+                <q-td key="ip" :props="props">{{ props.row.remote_addr }}</q-td>
+                <q-td key="lastOnline" :props="props">{{ props.row.last_heartbear_str }}</q-td>
+                <q-td key="version" :props="props">{{ props.row.version }}</q-td>
+                <q-td key="actions" :props="props">
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    color="primary"
+                    icon="edit"
+                    @click="editDevice(props.row)"
+                  />
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    color="negative"
+                    icon="delete"
+                    @click="confirmDelete(props.row)"
+                  />
+                </q-td>
+              </q-tr>
+            </template>
+          </q-table>
+        </q-card-section>
+      </q-card>
     </div>
 
+    <q-footer>
+      <q-toolbar class="bg-grey-1">
+        <q-pagination v-model="currentPage" :max="totalItems / pageSize + 1" input />
+        <q-space></q-space>
+        <q-toggle v-model="autoUpdateEnabled" label="自动刷新" @update:model-value="handleAutoUpdate" style="color: black;" />
+      </q-toolbar>
+    </q-footer>
     <!-- 添加/编辑设备对话框 -->
-    <q-dialog v-model="addDialog" persistent>
-      <q-card style="min-width: 350px">
+    <q-drawer v-model="addDrawer" side="right" :width="600" overlay elevated persistent>
+      <q-card flat>
         <q-card-section>
           <div class="text-h6">{{ isEditing ? '编辑设备' : '添加设备' }}</div>
         </q-card-section>
-
         <q-card-section>
           <q-form @submit="onSubmit" class="q-gutter-md">
             <q-input
-              v-model="form.name"
-              label="设备名称 *"
-              :rules="[(val) => !!val || '设备名称不能为空']"
+              v-model="form.sn"
+              label="设备SN *"
+              :rules="[(val) => !!val || '设备SN不能为空']"
               outlined
-              dense
-            />
-            <q-select
-              v-model="form.type"
-              :options="typeOptions"
-              label="设备类型 *"
-              :rules="[(val) => !!val || '请选择设备类型']"
-              outlined
-              dense
-              emit-value
-              map-options
-            />
-            <q-input v-model="form.ip" label="IP地址" outlined dense />
-            <q-select
-              v-model="form.status"
-              :options="statusOptions"
-              label="设备状态 *"
-              :rules="[(val) => !!val || '请选择设备状态']"
-              outlined
-              dense
-              emit-value
-              map-options
             />
           </q-form>
         </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="取消" color="primary" v-close-popup />
-          <q-btn flat label="保存" color="primary" @click="onSubmit" />
+        <q-card-actions class="q-gutter-sm q-mt-md row full-width">
+          <q-btn
+            outline
+            label="取消"
+            color="primary"
+            @click="addDrawer = false"
+            class="col q-py-sm text-subtitle1"
+          />
+          <q-btn
+            unelevated
+            label="保存"
+            color="primary"
+            @click="onSubmit"
+            class="col q-ml-sm q-py-sm text-subtitle1"
+          />
         </q-card-actions>
       </q-card>
-    </q-dialog>
+    </q-drawer>
 
     <!-- 删除确认对话框 -->
     <q-dialog v-model="deleteDialog" persistent>
@@ -166,20 +151,54 @@
 </template>
 
 <script setup lang="ts">
-import { QTableColumn } from 'quasar';
-import { ref, reactive, onMounted } from 'vue';
+// eslint-disable @typescript-eslint/no-explicit-any
+import { useQuasar, type QTableColumn } from 'quasar';
+import type { DeviceModel } from 'src/service/DeviceService';
+import { addDevice, listDevice } from 'src/service/DeviceService';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 
+const $q = useQuasar();
+
+// 对话框控制
+const addDrawer = ref(false);
+const deleteDialog = ref(false);
+const isEditing = ref(false);
+const currentDevice = ref<DeviceModel | null>(null);
+// 自动更新控制
+const autoUpdateEnabled = ref(false);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let autoUpdateTimer:any = null;
+
+// 分页控制
+const currentPage = ref(1);
+const pageSize = 30;
+const totalItems = ref(0);
+
+// 表单数据
+const form = reactive({
+  id: 0,
+  uid: 0,
+  sn: '',
+  createTime: 0,
+  updateTime: 0,
+  remote_addr: '',
+  version: '',
+  timestamp: 0,
+  last_heartbear: 0,
+});
+
+// 表格数据
+const devices = ref<DeviceModel[]>([]);
 // 表格列定义
 const columns = [
   { name: 'id', align: 'left', label: '设备ID', field: 'id', sortable: true },
-  { name: 'name', align: 'left', label: '设备名称', field: 'name', sortable: true },
-  { name: 'type', align: 'left', label: '设备类型', field: 'type', sortable: true },
+  { name: 'sn', align: 'left', label: '设备SN', field: 'sn', sortable: true },
   { name: 'status', align: 'left', label: '状态', field: 'status', sortable: true },
   { name: 'ip', align: 'left', label: 'IP地址', field: 'ip', sortable: true },
   { name: 'lastOnline', align: 'left', label: '最后在线时间', field: 'lastOnline', sortable: true },
+  { name: 'version', align: 'left', label: '版本', field: 'version' },
   { name: 'actions', align: 'center', label: '操作', field: 'actions' },
-];
-
+] as QTableColumn[];
 // 状态选项
 const statusOptions = [
   { label: '在线', value: '在线' },
@@ -187,58 +206,6 @@ const statusOptions = [
   { label: '维护中', value: '维护中' },
   { label: '故障', value: '故障' },
 ];
-
-// 设备类型选项
-const typeOptions = [
-  { label: '路由器', value: '路由器' },
-  { label: '交换机', value: '交换机' },
-  { label: '服务器', value: '服务器' },
-  { label: '其他', value: '其他' },
-];
-
-// 表格数据
-const devices = ref([
-  {
-    id: 1,
-    name: '设备-001',
-    type: '路由器',
-    status: '在线',
-    ip: '192.168.1.1',
-    lastOnline: '2023-05-15 14:30:22',
-  },
-  {
-    id: 2,
-    name: '设备-002',
-    type: '交换机',
-    status: '离线',
-    ip: '192.168.1.2',
-    lastOnline: '2023-05-14 09:15:43',
-  },
-  {
-    id: 3,
-    name: '设备-003',
-    type: '服务器',
-    status: '维护中',
-    ip: '192.168.1.3',
-    lastOnline: '2023-05-15 11:22:05',
-  },
-  {
-    id: 4,
-    name: '设备-004',
-    type: '路由器',
-    status: '故障',
-    ip: '192.168.1.4',
-    lastOnline: '2023-05-13 16:45:30',
-  },
-  {
-    id: 5,
-    name: '设备-005',
-    type: '服务器',
-    status: '在线',
-    ip: '192.168.1.5',
-    lastOnline: '2023-05-15 15:10:18',
-  },
-]);
 
 // 状态过滤器
 const statusFilter = ref(null);
@@ -248,30 +215,6 @@ const searchText = ref('');
 
 // 加载状态
 const loading = ref(false);
-
-// 分页设置
-const pagination = ref({
-  sortBy: 'id',
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 10,
-});
-
-// 对话框控制
-const addDialog = ref(false);
-const deleteDialog = ref(false);
-const isEditing = ref(false);
-const currentDevice = ref(null);
-
-// 表单数据
-const form = reactive({
-  id: null,
-  name: '',
-  type: '',
-  status: '',
-  ip: '',
-});
 
 // 获取状态颜色
 function getStatusColor(status: string) {
@@ -289,31 +232,24 @@ function getStatusColor(status: string) {
   }
 }
 
-// 搜索设备
-function onSearch() {
-  // 实际应用中这里会调用API进行搜索
-  loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-  }, 500);
-}
-
 // 打开添加对话框
 function openAddDialog() {
   isEditing.value = false;
   resetForm();
-  addDialog.value = true;
+  addDrawer.value = true;
 }
 
 // 编辑设备
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function editDevice(device: any) {
   isEditing.value = true;
   currentDevice.value = device;
   Object.assign(form, device);
-  addDialog.value = true;
+  addDrawer.value = true;
 }
 
 // 确认删除
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function confirmDelete(device: any) {
   currentDevice.value = device;
   deleteDialog.value = true;
@@ -323,55 +259,119 @@ function confirmDelete(device: any) {
 function deleteDevice() {
   if (currentDevice.value) {
     // 实际应用中这里会调用API进行删除
-    // const index = currentDevice.value?.id ? devices.value.findIndex((d) => d.id === currentDevice.value.id) : -1;
-    // if (index !== -1) {
-    //   devices.value.splice(index, 1);
-    // }
+    const index = devices.value.findIndex((d) => d.id === currentDevice.value?.id);
+    if (index !== -1) {
+      devices.value.splice(index, 1);
+    }
   }
 }
 
-// 查看设备详情
-function viewDeviceDetails(device: any) {
-  // 实际应用中这里可能会跳转到详情页或打开详情对话框
-  console.log('查看设备详情:', device);
-}
-
 // 提交表单
-function onSubmit() {
-  // // 实际应用中这里会调用API进行保存
-  // if (isEditing.value && currentDevice.value) {
-  //   // 更新现有设备
-  //   const index = devices.value.findIndex((d) => d.id === currentDevice.value.id);
-  //   if (index !== -1) {
-  //     devices.value[index] = { ...devices.value[index], ...form };
-  //   }
-  // } else {
-  //   // 添加新设备
-  //   const newId = Math.max(...devices.value.map((d) => d.id)) + 1;
-  //   devices.value.push({
-  //     ...form,
-  //     id: newId,
-  //     lastOnline: new Date().toLocaleString(),
-  //   });
-  // }
-  // addDialog.value = false;
+async function onSubmit() {
+  if (isEditing.value && currentDevice.value) {
+    // 更新现有设备
+    // const index = devices.value.findIndex((d) => d.id === currentDevice.value.id);
+    // if (index !== -1) {
+    //   devices.value[index] = { ...devices.value[index], ...form };
+    // }
+  } else {
+    // 添加新设备
+    const resp = await addDevice({
+      id: 0,
+      sn: form.sn,
+      uid: 0,
+      createTime: 0,
+      updateTime: 0,
+      remote_addr: '',
+      version: '',
+      timestamp: 0,
+      last_heartbear: 0,
+    });
+    console.log(resp);
+  }
+
+  resetForm();
+  addDrawer.value = false;
+
+  await onLoad();
 }
 
 // 重置表单
 function resetForm() {
-  form.id = null;
-  form.name = '';
-  form.type = '';
-  form.status = '';
-  form.ip = '';
+  form.id = 0;
+  form.sn = '';
+  form.uid = 0;
+  form.createTime = 0;
+  form.updateTime = 0;
+  form.remote_addr = '';
+  form.version = '';
+  form.timestamp = 0;
+  form.last_heartbear = 0;
+}
+
+function handleAutoUpdate() {
+  if (autoUpdateEnabled.value) {
+    // 启用自动更新
+    autoUpdateTimer = setInterval(() => {
+      onLoad().then(() => {
+        console.log('Auto update completed.');
+      }).catch((error) => {
+        // 处理错误
+        console.error('Auto update error:', error);
+      });
+    }, 10000);
+  } else {
+    // 禁用自动更新，清除定时器
+    if (autoUpdateTimer) {
+      clearInterval(autoUpdateTimer);
+      autoUpdateTimer = null;
+    }
+  }
+}
+
+// 搜索设备
+async function onLoad() {
+  loading.value = true;
+  const resp = await listDevice({ page: currentPage, pageSize: pageSize });
+  loading.value = false;
+
+  console.log(resp);
+  if (!resp) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      icon: 'report_problem',
+      message: '网络错误',
+    });
+    return;
+  }
+
+  if (resp.code != 0) {
+    $q.notify(resp.msg);
+    return;
+  }
+
+  if (resp.code === 0 && resp.data) {
+    for (let i = 0; i < resp.data.length; i++) {
+      resp.data[i]!.status = Date.now() - resp.data[i]!.last_heartbear <= 60000 ? '在线' : '离线';
+
+      resp.data[i]!.last_heartbear_str = new Date(resp.data[i]!.last_heartbear).toLocaleString(); // 转换时间戳为可读格式
+    }
+
+    totalItems.value = resp.total as number;
+    devices.value = resp.data;
+  }
 }
 
 // 页面加载时获取数据
-onMounted(() => {
-  // 实际应用中这里会调用API获取数据
-  loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-  }, 500);
+onMounted(async () => {
+  await onLoad();
+});
+onUnmounted(() => {
+  // 组件卸载时清除定时器
+  if (autoUpdateTimer) {
+    clearInterval(autoUpdateTimer);
+    autoUpdateTimer = null;
+  }
 });
 </script>

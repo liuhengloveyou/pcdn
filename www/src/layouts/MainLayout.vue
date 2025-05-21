@@ -13,31 +13,27 @@
     <q-drawer
       show-if-above
       :mini="miniState"
-      :width="230"
+      :width="255"
       :breakpoint="500"
-      :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+      style="background-color: #191b20; color: #fafafa"
     >
-      <q-scroll-area
-        style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd"
-      >
-        <q-list>
-          <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-        </q-list>
-      </q-scroll-area>
-
-      <q-img
-        class="absolute-top"
-        src="https://cdn.quasar.dev/img/material.png"
-        style="height: 150px"
-      >
-        <div class="absolute-bottom bg-transparent">
+      <q-card v-if="!miniState" flat style="background-color: #191b20; color: #fafafa">
+        <q-card-section class="text-h6 text-center">
           <q-avatar size="56px" class="q-mb-sm">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
           </q-avatar>
-          <div class="text-weight-bold">刘恒</div>
-          <div>@liuheng</div>
-        </div>
-      </q-img>
+          <div>
+            <div class="text-weight-bold">刘恒</div>
+            <div>@liuheng</div>
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <q-scroll-area style="height: calc(100% - 160px); border-right: 1px solid #191b20">
+        <q-list padding>
+          <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
@@ -112,10 +108,10 @@ const linksList: EssentialLinkProps[] = [
     link: 'https://awesome.quasar.dev',
   },
   {
-    title: '设备冻结款管理',
-    caption: 'Community Quasar projects',
-    icon: 'lock_clock', // 更改为锁定/冻结相关图标
-    link: 'https://awesome.quasar.dev',
+    title: '系统管理',
+    caption: '系统设置与权限管理',
+    icon: 'settings',
+    link: '#/system',
   },
 ];
 
