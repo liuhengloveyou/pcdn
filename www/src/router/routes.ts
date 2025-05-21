@@ -2,6 +2,11 @@ import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
+    path: '/login',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [{ path: '', component: import('pages/LoginPage.vue') }],
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -11,6 +16,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'providers', component: () => import('pages/ProviderManagementPage.vue') },
       { path: 'member-levels', component: () => import('pages/MemberLevelPage.vue') },
       { path: 'provider-levels', component: () => import('pages/ProviderLevelPage.vue') },
+      { path: 'system', component: () => import('pages/SystemManagementPage.vue') },
     ],
   },
 
