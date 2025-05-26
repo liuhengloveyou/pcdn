@@ -5,7 +5,6 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/vue-table'
-import type { Task } from '../data/schema'
 import DataTablePagination from '@/components/data-table/table-pagination.vue'
 import {
   Table,
@@ -27,10 +26,12 @@ import {
 } from '@tanstack/vue-table'
 import { ref } from 'vue'
 import DataTableToolbar from './data-table-toolbar.vue'
+import type { DeviceModel } from '@/services/DeviceService'
+import type { Device } from './columns'
 
 interface DataTableProps {
-  columns: ColumnDef<Task, any>[]
-  data: Task[]
+  columns: ColumnDef<Device, any>[]
+  data: DeviceModel[]
 }
 const props = defineProps<DataTableProps>()
 

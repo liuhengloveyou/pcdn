@@ -1,8 +1,10 @@
-export interface HttpResponse<T> {
+export interface HttpResponse<T = never> {
   code: number;
+  total?: number;
   msg: string;
   data: T;
 }
+
 
 export interface UserInfoStruct {
   uid: number;

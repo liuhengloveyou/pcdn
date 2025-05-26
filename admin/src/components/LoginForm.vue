@@ -12,18 +12,33 @@ import { toast } from "vue-sonner";
 import { toTypedSchema } from "@vee-validate/zod";
 import z from "zod";
 import { useForm } from "vee-validate";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 defineOptions({
   name: "LoginForm",
 });
 
 const cellphone = ref("");
-const password = ref("");
 const isLoading = ref(false);
+const rememberMe = ref(false); // 添加记住密码选项
 const sessionStore = useUserSessionStore();
 const router = useRouter();
 
 onMounted(() => {
+  // 检查本地存储中是否有保存的手机号
+  const savedCellphone = localStorage.getItem("rememberedCellphone");
+  if (savedCellphone) {
+    cellphone.value = savedCellphone;
+    rememberMe.value = true;
+  }
+
   // 重新登录
   document.cookie =
     "trade-sess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;max-age=0";
@@ -33,11 +48,16 @@ onUnmounted(() => {
   // clearTimeout(smsTimer);
 });
 
-
 const formSchema = toTypedSchema(
   z.object({
-    cellphone: z.string().length(11),
-    password: z.string().min(6).max(50),
+    cellphone: z
+      .string()
+      .length(11, "手机号必须是11位")
+      .regex(/^1[3-9]\d{9}$/, "请输入有效的手机号"),
+    password: z
+      .string()
+      .min(6, "密码至少需要6个字符")
+      .max(50, "密码不能超过50个字符"),
   })
 );
 
@@ -45,18 +65,12 @@ const { handleSubmit } = useForm({
   validationSchema: formSchema,
 });
 
-const onSubmit = handleSubmit((values: { cellphone: string; password: string; }) => {
-  // toast({
-  //   title: "You submitted the following values:",
-  //   description: h(
-  //     "pre",
-  //     { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
-  //     h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
-  //   ),
-  // });
-
-  onRealSubmit(values.cellphone, values.password);
-});
+const onSubmit = handleSubmit(
+  (values: { cellphone: string; password: string }) => {
+    console.log(">>>>>>values", values);
+    onRealSubmit(values.cellphone, values.password);
+  }
+);
 
 async function onRealSubmit(cellphone: string, password: string) {
   // 表单验证
@@ -77,6 +91,13 @@ async function onRealSubmit(cellphone: string, password: string) {
   isLoading.value = true;
 
   try {
+    // 如果选择了记住密码，保存手机号到本地存储
+    if (rememberMe.value) {
+      localStorage.setItem("rememberedCellphone", cellphone.trim());
+    } else {
+      localStorage.removeItem("rememberedCellphone");
+    }
+
     // 调用登录API
     const resp = await AccountService.login(
       cellphone.trim(),
@@ -98,8 +119,8 @@ async function onRealSubmit(cellphone: string, password: string) {
   } catch (error) {
     console.error("登录出错:", error);
     toast("错误", {
-        description: "登录过程中发生错误，请稍后再试",
-      });
+      description: "登录过程中发生错误，请稍后再试",
+    });
   } finally {
     isLoading.value = false;
   }
@@ -115,27 +136,55 @@ async function onRealSubmit(cellphone: string, password: string) {
       </p>
     </div>
     <div class="grid gap-6">
-      <div class="grid gap-2">
-        <Label for="cellphone">手机号码:</Label>
-        <Input
-          id="cellphone"
-          v-model="cellphone"
-          type="text"
-          placeholder="请输入您的手机号码"
-          required
+      <FormField v-slot="{ componentField }" name="cellphone">
+        <FormItem>
+          <FormLabel>手机号码:</FormLabel>
+          <FormControl>
+            <Input
+              id="cellphone"
+              type="text"
+              placeholder="请输入您的手机号码"
+              required
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormDescription />
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="password">
+        <FormItem>
+          <div class="flex items-center">
+            <FormLabel>密码:</FormLabel>
+            <a
+              href="#/forgot-password"
+              class="ml-auto text-sm underline-offset-4 hover:underline"
+            >
+              忘记密码？
+            </a>
+          </div>
+          <FormControl>
+            <Input
+              id="password"
+              type="passport"
+              required
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormDescription />
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <div class="flex items-center space-x-2">
+        <input
+          id="remember"
+          type="checkbox"
+          v-model="rememberMe"
+          class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
         />
-      </div>
-      <div class="grid gap-2">
-        <div class="flex items-center">
-          <Label for="password">密码</Label>
-          <a
-            href="#"
-            class="ml-auto text-sm underline-offset-4 hover:underline"
-          >
-            忘记密码？
-          </a>
-        </div>
-        <Input id="password" v-model="password" type="password" required />
+        <Label for="remember" class="text-sm">记住手机号</Label>
       </div>
       <Button type="submit" class="w-full" :disabled="isLoading">
         {{ isLoading ? "登录中..." : "登录" }}
@@ -143,7 +192,7 @@ async function onRealSubmit(cellphone: string, password: string) {
     </div>
     <div class="text-center text-sm">
       还没有账户？
-      <a href="#" class="underline underline-offset-4"> 注册 </a>
+      <a href="#/register" class="underline underline-offset-4"> 注册 </a>
     </div>
   </form>
 

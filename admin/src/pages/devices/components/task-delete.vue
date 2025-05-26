@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { h } from 'vue';
-import type { Task } from '../data/schema'
 import { toast } from '@/components/ui/toast/use-toast'
+import type { Device } from './columns';
 
 const props = defineProps<{
-  task: Task
+  task: Device
 }>()
 
 function handleRemove() {

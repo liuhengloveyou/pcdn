@@ -12,10 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { Row } from '@tanstack/vue-table'
 import { computed, ref, shallowRef, type Component } from 'vue'
-import type { Task } from '../data/schema'
 import { Ellipsis, FilePenLine, Trash2 } from 'lucide-vue-next'
 import { labels } from '../data/data'
-import { taskSchema } from '../data/schema'
 import TaskDelete from './task-delete.vue'
 import TaskResourceDialog from './task-resource-dialog.vue'
 import { Button } from '@/components/ui/button'
@@ -26,16 +24,17 @@ import DropdownMenuRadioGroup from '@/components/ui/dropdown-menu/DropdownMenuRa
 import DropdownMenuRadioItem from '@/components/ui/dropdown-menu/DropdownMenuRadioItem.vue'
 import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue'
 import DropdownMenuShortcut from '@/components/ui/dropdown-menu/DropdownMenuShortcut.vue'
+import { deviceSchema, type Device } from './columns'
 
 
 const props = defineProps<DataTableRowActionsProps>()
 
 interface DataTableRowActionsProps {
-  row: Row<Task>
+  row: Row<Device>
 }
-const task = computed(() => taskSchema.parse(props.row.original))
+const task = computed(() => deviceSchema.parse(props.row.original))
 
-const taskLabel = ref(task.value.label)
+const taskLabel = ref(task.value.sn)
 
 const showComponent = shallowRef<Component | null>(null)
 
