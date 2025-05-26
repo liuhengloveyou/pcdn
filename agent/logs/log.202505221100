@@ -1,0 +1,6 @@
+2025-05-22 11:00:50.503	info	agent/common.go:42	initLog OK
+
+2025-05-22 11:00:50.520	error	agent/tcp_client.go:23	连接服务端失败	{"error": "dial tcp 127.0.0.1:10001: connect: connection refused"}
+2025-05-22 11:00:55.525	error	agent/tcp_client.go:23	连接服务端失败	{"error": "dial tcp 127.0.0.1:10001: connect: connection refused"}
+2025-05-22 11:01:00.530	error	agent/tcp_client.go:23	连接服务端失败	{"error": "dial tcp 127.0.0.1:10001: connect: connection refused"}
+2025-05-22 11:01:05.535	error	agent/tcp_client.go:23	连接服务端失败	{"error": "dial tcp 127.0.0.1:10001: connect: connection refused"}

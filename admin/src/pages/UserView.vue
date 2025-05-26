@@ -10,7 +10,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { onMounted, onUnmounted, ref } from "vue";
 import MartParamComponent from "@/components/MartParamComponent.vue";
-import { MartParamModel, MartParamService } from "@/services/MartParamService";
+import { type MartParamModel, MartParamService } from "@/services/MartParamService";
 import { useI18n } from "vue-i18n";
 import Toaster from "@/components/ui/toast/Toaster.vue";
 import { toast } from "@/components/ui/toast";

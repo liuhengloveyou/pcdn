@@ -12,6 +12,7 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 BINARY_NAME=agent
 BINARY_UNIX=$(BINARY_NAME)_unix
+BINARY_ARM=$(BINARY_NAME)_arm
 
 all: build
 
@@ -23,7 +24,11 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(BINARY_UNIX)
+	rm -f $(BINARY_ARM)
 
 # Cross compilation
 linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) --ldflags ${flags} -o $(BINARY_UNIX) -v
+
+arm:
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GOBUILD) --ldflags ${flags} -o $(BINARY_ARM) -v

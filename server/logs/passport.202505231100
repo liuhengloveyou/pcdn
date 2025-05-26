@@ -1,0 +1,56 @@
+2025-05-23 11:32:11.135	info	common/common.go:135	passport initLog OK
+
+2025-05-23 11:32:16.919	debug	face/httpApi.go:394	passport session:	{"auth": false, "api": "user/auth"}
+2025-05-23 11:32:16.919	warn	face/httpApi.go:397	session nil.	{"api": "user/auth"}
+2025-05-23 11:44:54.532	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\"email\":\"17612116527\",\"password\":\"123456\",\"sms\":\"\"}"}
+2025-05-23 11:44:54.533	error	face/httpApi.go:565	readJsonBodyFromRequest Validate ERR: 	{"error": "Key: 'UserReq.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+2025-05-23 11:44:54.536	error	face/userLogin.api.go:26	userLogin param ERR: -1000 请求参数错误
+2025-05-23 11:50:33.131	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\n\t\"email\": \"15360651247\",\n\t\"password\": \"123456\"\n}"}
+2025-05-23 11:50:33.131	error	face/httpApi.go:565	readJsonBodyFromRequest Validate ERR: 	{"error": "Key: 'UserReq.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+2025-05-23 11:50:33.133	error	face/userAdd.api.go:20	userAdd param ERR: -1000 请求参数错误
+2025-05-23 11:50:48.572	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\n\t\"cellphone\": \"15360651247\",\n\t\"password\": \"123456\"\n}"}
+2025-05-23 11:50:48.573	info	face/userAdd.api.go:23	userAdd body: &protos.UserReq{UID:0x0, TenantID:0x0, Cellphone:"15360651247", Email:"", Nickname:"", Password:"123456", AvatarURL:"", Addr:"", Gender:0, SmsCode:"", WxOpenId:"", Roles:[]string(nil), DepIds:[]uint64(nil), Ext:protos.MapStruct(nil), Disable:0, PageNo:0x0, PageSize:0x0}
+
+2025-05-23 11:50:48.574	debug	dao/user.dao.go:256	SELECT * FROM users WHERE cellphone = ? LIMIT 1 OFFSET 0 [15360651247] <nil>
+2025-05-23 11:50:48.637	debug	dao/user.dao.go:256	SELECT * FROM users WHERE nickname = ? LIMIT 100 OFFSET 0 [15360651247] <nil>
+2025-05-23 11:50:48.643	debug	dao/user.dao.go:38	INSERT INTO users (add_time,cellphone,nickname,password) Values (?,?,?,?) [2025-05-23 11:50:48.643360389 +0800 CST m=+1117.645324929 15360651247 15360651247 34fe01838120f5826acd9f3c94139a463342f6be07c4be97bb027ae4ecc77abf] <nil>
+
+2025-05-23 11:50:48.649	error	service/user.service.go:66	dao.UserInsert ERR: Error 1146 (42S02): Table 'pcdn.users' doesn't exist
+
+2025-05-23 11:50:48.649	error	face/userAdd.api.go:46	userAdd service.AddUser ERR: -1001 服务错误
+2025-05-23 11:51:55.588	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\n\t\"cellphone\": \"15360651247\",\n\t\"password\": \"123456\"\n}"}
+2025-05-23 11:51:55.589	info	face/userAdd.api.go:23	userAdd body: &protos.UserReq{UID:0x0, TenantID:0x0, Cellphone:"15360651247", Email:"", Nickname:"", Password:"123456", AvatarURL:"", Addr:"", Gender:0, SmsCode:"", WxOpenId:"", Roles:[]string(nil), DepIds:[]uint64(nil), Ext:protos.MapStruct(nil), Disable:0, PageNo:0x0, PageSize:0x0}
+
+2025-05-23 11:51:55.589	debug	dao/user.dao.go:256	SELECT * FROM users WHERE cellphone = ? LIMIT 1 OFFSET 0 [15360651247] <nil>
+2025-05-23 11:51:55.611	debug	dao/user.dao.go:260	SELECT * FROM users WHERE cellphone = ? LIMIT 1 OFFSET 0 [15360651247] []
+2025-05-23 11:51:55.611	debug	dao/user.dao.go:256	SELECT * FROM users WHERE nickname = ? LIMIT 100 OFFSET 0 [15360651247] <nil>
+2025-05-23 11:51:55.617	debug	dao/user.dao.go:260	SELECT * FROM users WHERE nickname = ? LIMIT 100 OFFSET 0 [15360651247] []
+2025-05-23 11:51:55.618	debug	dao/user.dao.go:38	INSERT INTO users (add_time,cellphone,nickname,password) Values (?,?,?,?) [2025-05-23 11:51:55.618356846 +0800 CST m=+1184.620322286 15360651247 15360651247 34fe01838120f5826acd9f3c94139a463342f6be07c4be97bb027ae4ecc77abf] <nil>
+
+2025-05-23 11:51:55.643	info	face/userAdd.api.go:58	user add ok:10000
+2025-05-23 11:52:09.499	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\"email\":\"15360651247\",\"password\":\"123456\",\"sms\":\"\"}"}
+2025-05-23 11:52:09.500	error	face/httpApi.go:565	readJsonBodyFromRequest Validate ERR: 	{"error": "Key: 'UserReq.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+2025-05-23 11:52:09.500	error	face/userLogin.api.go:26	userLogin param ERR: -1000 请求参数错误
+2025-05-23 11:53:13.055	debug	face/httpApi.go:553	readJsonBodyFromRequest body: 	{"body": "{\"cellphone\":\"15360651247\",\"password\":\"123456\",\"sms\":\"\"}"}
+2025-05-23 11:53:13.057	info	face/userLogin.api.go:29	userLogin: &protos.UserReq{UID:0x0, TenantID:0x0, Cellphone:"15360651247", Email:"", Nickname:"", Password:"123456", AvatarURL:"", Addr:"", Gender:0, SmsCode:"", WxOpenId:"", Roles:[]string(nil), DepIds:[]uint64(nil), Ext:protos.MapStruct(nil), Disable:0, PageNo:0x0, PageSize:0x0}
+
+2025-05-23 11:53:13.062	debug	dao/user.dao.go:218	SELECT * FROM users WHERE cellphone = ? LIMIT 1 [15360651247] <nil>
+2025-05-23 11:53:13.087	error	service/user.login.service.go:162	UserLogin: &protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc00012ecd8), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc00012ecf0), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Location("Asia/Shanghai")), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Location("Asia/Shanghai")), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}
+
+2025-05-23 11:53:13.091	info	face/userLogin.api.go:70	user login ok: &{0 0 15360651247   123456   0   [] [] map[] 0 0 0} sess: &sessions.Session{ID:"", Values:map[interface {}]interface {}{"sess-user":(*protos.User)(0xc0003696c0)}, Options:(*sessions.Options)(0xc00005b380), IsNew:true, store:(*sessions.CookieStore)(0xc00009c220), name:"pcdn-sess"} 
+
+2025-05-23 11:54:20.207	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 11:54:20.211	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 11:54:20.212	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 11:54:20.213	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc000010720), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc000010738), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}
+2025-05-23 11:54:26.733	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 11:54:26.735	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 11:54:26.736	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 11:54:26.738	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc00012f7a0), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc00012f7b8), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}
+2025-05-23 11:58:18.625	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 11:58:18.628	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 11:58:18.628	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 11:58:18.629	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc00012f368), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc00012f380), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}

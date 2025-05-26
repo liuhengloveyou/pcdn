@@ -1,0 +1,15 @@
+2025-05-23 13:46:41.493	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 13:46:41.495	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 13:46:41.495	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 13:46:41.496	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc00012f158), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc00012f170), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}
+2025-05-23 13:48:30.506	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 13:48:30.507	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 13:48:30.507	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 13:48:30.509	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc0000109a8), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc0000109c0), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}
+2025-05-23 13:49:19.704	debug	face/httpApi.go:394	passport session:	{"auth": true, "api": "user/auth"}
+2025-05-23 13:49:19.705	debug	face/httpApi.go:508	AccessFilter obj: user/auth
+
+2025-05-23 13:49:19.706	debug	face/httpApi.go:532	AccessFilter needAccess: user/auth false
+2025-05-23 13:49:19.707	info	face/userAuth.api.go:27	UserAuth OK: protos.User{UID:0x2710, TenantID:0x0, Password:"", Cellphone:(*zero.String)(0xc00036c870), Email:(*zero.String)(nil), Nickname:(*zero.String)(0xc00036c888), AvatarURL:(*zero.String)(nil), Addr:(*zero.String)(nil), Gender:(*zero.Int)(nil), Province:(*zero.String)(nil), City:(*zero.String)(nil), AddTime:time.Date(2025, time.May, 23, 11, 51, 56, 0, time.Local), UpdateTime:time.Date(2025, time.May, 23, 11, 51, 55, 0, time.Local), DeleteTime:<nil>, LoginTime:time.Date(2025, time.May, 23, 11, 53, 13, 70401468, time.Local), Tenant:(*protos.Tenant)(nil), Roles:[]protos.RoleStruct(nil), Departments:[]protos.Department(nil), WxOpenId:(*zero.String)(nil), Ext:protos.MapStruct(nil), CacheTime:0}

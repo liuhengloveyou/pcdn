@@ -1,0 +1,16 @@
+[Unit]
+Description=pcdnnc
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/pcdnclient -A=xxx --vendor_prefix=xxx --sn_length=xx -isoutside=xx --remote=url
+Restart= on-failure
+RestartSec= 5
+User=root
+Group=root
+KillMode=process
+StandardOutput=file:/var/log/pcdn.log
+StandardError=file:/var/log/pcdnerr.log
+[Install]
+WantedBy=multi-user.target
+

@@ -8,9 +8,7 @@ import {
 import Toaster from "@/components/ui/toast/Toaster.vue";
 import RecentTransaction from "@/components/RecentTransaction.vue";
 import StrategicBots from "@/components/StrategicBots.vue";
-import AIBots from "@/components/AIBotsComponent.vue";
 import RiskControlBots from "@/components/RiskControlBots.vue";
-import BalanceComponent from "@/components/BalanceComponent.vue";
 import VolumeBots from "@/components/VolumeBots.vue";
 import DepthBots from "@/components/DepthBots.vue";
 
