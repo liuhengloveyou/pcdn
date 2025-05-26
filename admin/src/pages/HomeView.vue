@@ -5,12 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Toaster from "@/components/ui/toast/Toaster.vue";
-import RecentTransaction from "@/components/RecentTransaction.vue";
-import StrategicBots from "@/components/StrategicBots.vue";
-import RiskControlBots from "@/components/RiskControlBots.vue";
-import VolumeBots from "@/components/VolumeBots.vue";
-import DepthBots from "@/components/DepthBots.vue";
 
 defineOptions({
   name: "HomeView",

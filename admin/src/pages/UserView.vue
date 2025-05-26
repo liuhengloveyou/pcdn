@@ -2,53 +2,44 @@
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { onMounted, onUnmounted, ref } from "vue";
-import MartParamComponent from "@/components/MartParamComponent.vue";
-import { type MartParamModel, MartParamService } from "@/services/MartParamService";
-import { useI18n } from "vue-i18n";
-import Toaster from "@/components/ui/toast/Toaster.vue";
-import { toast } from "@/components/ui/toast";
+import { onMounted, onUnmounted } from "vue";
 
 defineOptions({
   name: "UserView",
 });
 
-const { t } = useI18n();
+// const { t } = useI18n();
 // const tab = ref("mart");
-const martParamDialog = ref(false);
-const models = ref<MartParamModel[]>([]);
 // const editModelId = ref(0);
 
 onMounted(() => {
-  loadMyMartParam();
 });
 
 onUnmounted(() => {});
 
-async function loadMyMartParam() {
-  const resp = await MartParamService.Load();
-  if (resp) {
-    if (resp.code == 0) {
-      models.value = resp.data;
-    } else {
-      toast({
-        variant: "destructive",
-        title: t("error." + resp.code),
-      });
-      // q.notify({ message: , type: 'warning' });
-    }
-  }
-}
+// async function loadMyMartParam() {
+//   const resp = await MartParamService.Load();
+//   if (resp) {
+//     if (resp.code == 0) {
+//       models.value = resp.data;
+//     } else {
+//       toast({
+//         variant: "destructive",
+//         title: t("error." + resp.code),
+//       });
+//       // q.notify({ message: , type: 'warning' });
+//     }
+//   }
+// }
 
 function onMartParamCommited(_data: any) {
-  martParamDialog.value = false;
-  loadMyMartParam();
+  // martParamDialog.value = false;
+  // loadMyMartParam();
 }
 </script>
 
@@ -82,7 +73,7 @@ function onMartParamCommited(_data: any) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="(mart, idx) in models" :key="idx">
+            <!-- <TableRow v-for="(mart, idx) in models" :key="idx">
               <TableCell> {{ mart.domain }} </TableCell>
               <TableCell> {{ mart.symbol }} </TableCell>
               <TableCell> {{ mart.accessKey }} </TableCell>
@@ -90,7 +81,7 @@ function onMartParamCommited(_data: any) {
               <TableCell>
                 <MartParamComponent :id="mart.id" @commited="onMartParamCommited" />
               </TableCell>
-            </TableRow>
+            </TableRow> -->
           </TableBody>
         </Table>
       </TabsContent>

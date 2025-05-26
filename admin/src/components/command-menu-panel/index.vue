@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from '@/components/ui/command'
 import { useMagicKeys } from "@vueuse/core";
 import { Search } from "lucide-vue-next";
