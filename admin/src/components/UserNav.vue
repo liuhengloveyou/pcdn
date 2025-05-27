@@ -21,7 +21,7 @@ const sessUser = computed(() => UserSessionStore.getSessionUser);
 
 function logout() {
   document.cookie =
-    "trade-sess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;max-age=0";
+    "pcdn-sess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;max-age=0";
   UserSessionStore.logout();
   router.replace("/login");
 }
