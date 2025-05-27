@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table'
-import DataTableFacetedFilter from '@/components/data-table/faceted-filter.vue'
 import DataTableViewOptions from '@/components/data-table/view-options.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X } from 'lucide-vue-next'
-import { priorities, statuses } from '../data/data'
 import { computed } from 'vue'
 import type { Device } from './columns'
 
