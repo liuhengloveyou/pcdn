@@ -26,18 +26,11 @@ async function onLoad() {
   console.log(resp);
   if (!resp) {
     toast.error('网络错误');
-    // $q.notify({
-    //   color: 'negative',
-    //   textColor: 'white',
-    //   icon: 'report_problem',
-    //   message: '网络错误',
-    // });
-
     return;
   }
 
   if (resp.code != 0) {
-    // $q.notify(resp.msg);
+    toast.error(resp.msg);
     return;
   }
 
@@ -45,6 +38,7 @@ async function onLoad() {
     for (let i = 0; i < resp.data.length; i++) {
       resp.data[i]!.status = Date.now() - resp.data[i]!.last_heartbear <= 60000 ? '在线' : '离线';
       resp.data[i]!.last_heartbear_str = new Date(resp.data[i]!.last_heartbear).toLocaleString(); // 转换时间戳为可读格式
+      resp.data[i]!.version = "0.0.1"
     }
 
     totalItems.value = resp.total as number;

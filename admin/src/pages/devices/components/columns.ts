@@ -46,6 +46,13 @@ export const columns: ColumnDef<Device>[] = [
     },
   },
   {
+    accessorKey: 'version',
+    header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '版本' }),
+    cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('version')),
+    enableSorting: false,
+    enableHiding: true,
+  },
+  {
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '状态' }),
 
@@ -65,6 +72,13 @@ export const columns: ColumnDef<Device>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
+  },
+  {
+    accessorKey: 'last_heartbear_str',
+    header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '最后活跃时间' }),
+    cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('last_heartbear_str')),
+    enableSorting: true,
+    enableHiding: true,
   },
   // {
   //   accessorKey: 'priority',
@@ -88,6 +102,7 @@ export const columns: ColumnDef<Device>[] = [
   // },
   {
     id: 'actions',
+    header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '操作' }),
     cell: ({ row }) => h(DataTableRowActions, { row }),
   },
 ]
