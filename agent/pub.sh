@@ -1,3 +1,5 @@
 #!/bin/bash
 
-scp -P 58779 agent_arm root@10.10.10.102:/tmp/
+# ssh -p 58779 root@10.10.10.102
+
+scp -P 58779 agent root@10.10.10.102:/opt/pcdnagent/

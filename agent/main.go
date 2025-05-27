@@ -28,20 +28,21 @@ var (
 
 	Sig string
 
-	showVer   = flag.Bool("version", false, "打印版本号")
-	initSys   = flag.Bool("init", false, "初始化系统")
-	tcpServer = flag.String("tcp_server", "101.37.182.58:10001", "tcp服务地址")
+	showVer      = flag.Bool("version", false, "打印版本号")
+	initSys      = flag.Bool("init", false, "初始化系统")
+	tcpServer    = flag.String("tcp_server", "http://pcdn.intelliflyt.com:10001", "tcp服务地址")
+	updateServer = flag.String("update_server", "http://pcdn.intelliflyt.com/update", "更新服务器地址")
 )
 
 // go-selfupdate setup and config
 var updater = &selfupdate.Updater{
-	CurrentVersion:     Version,                         // 手动更新常量，或使用 `go build -ldflags="-X main.VERSION=<newver>" -o hello-updater src/hello-updater/main.go` 设置
-	ApiURL:             "http://localhost:10000/update", // 托管 `$CmdName/$GOOS-$ARCH.json` 的服务器地址，该文件包含二进制文件的校验和
-	BinURL:             "http://localhost:10000/update", // 托管二进制应用压缩包的服务器地址，作为补丁方法的备用
-	DiffURL:            "http://localhost:10000/update", // 托管二进制补丁差异的服务器地址，用于增量更新
-	Dir:                "updated/",                      // 应用运行时创建的目录，用于存储 cktime 文件
-	CmdName:            "agent",                         // 应用名称，会附加到 ApiURL 后用于查找更新
-	ForceCheck:         true,                            // 对于此示例，除非版本为 "dev"，否则始终检查更新
+	CurrentVersion:     Version,                   // 手动更新常量，或使用 `go build -ldflags="-X main.VERSION=<newver>" -o hello-updater src/hello-updater/main.go` 设置
+	ApiURL:             *updateServer,             // 托管 `$CmdName/$GOOS-$ARCH.json` 的服务器地址，该文件包含二进制文件的校验和
+	BinURL:             *updateServer,             // 托管二进制应用压缩包的服务器地址，作为补丁方法的备用
+	DiffURL:            *updateServer,             // 托管二进制补丁差异的服务器地址，用于增量更新
+	Dir:                "/opt/pcdnagent/updated/", // 应用运行时创建的目录，用于存储 cktime 文件
+	CmdName:            "agent",                   // 应用名称，会附加到 ApiURL 后用于查找更新
+	ForceCheck:         true,                      // 对于此示例，除非版本为 "dev"，否则始终检查更新
 	OnSuccessfulUpdate: onUpdated,
 }
 

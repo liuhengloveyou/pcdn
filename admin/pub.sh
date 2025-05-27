@@ -1,3 +1,5 @@
 #!/bin/bash
 
-scp -P 58779 agent_arm root@10.10.10.102:/tmp/
+npm run build
+
+scp -r dist/* root@101.37.182.58:/opt/pcdn/www/

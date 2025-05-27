@@ -23,5 +23,11 @@ go.work.sum
 
 # env file
 .env
+
 agent/updated/
 agent/update/
+server/logs/
+server/pcdn-server
+server/log
+server/log.passport
+agent/logs/

@@ -254,3 +254,38 @@ iperf3 -c <服务端IP> -R -t 10
 
 3. **规则未生效**  
    - 检查 `tc -s class show dev eth0` 确认流量是否进入 `1:1` 类。
+
+
+
+
+   ## 使用方法
+1. 复制服务文件到系统目录 ：
+```
+sudo cp /opt/pcdn/agent/pcdnagent-arm.service /etc/systemd/system/
+```
+2. 重新加载systemd配置 ：
+```
+sudo systemctl daemon-reload
+```
+3. 启用服务开机自启 ：
+```
+sudo systemctl enable pcdnagent-arm.service
+```
+4. 启动服务 ：
+```
+sudo systemctl start pcdnagent-arm.service
+```
+5. 查看服务状态 ：
+```
+sudo systemctl status pcdnagent-arm.service
+```
+6. 查看服务日志 ：
+```
+sudo journalctl -u pcdnagent-arm.service
+```
+或
+
+```
+cat /var/log/pcdnagent.log
+```
+这个服务脚本会在系统启动时自动运行，并在服务崩溃时自动重启，确保pcdnagent服务的持续运行。
