@@ -1,4 +1,4 @@
-VERSION=0.0.1
+VERSION=0.0.3
 BUILD_TIME=$(shell date "+%FZ%T")
 COMMIT_SHA1=$(shell git rev-parse HEAD)
 GIT_TAG=$(shell git describe --abbrev=0 --always)
@@ -10,7 +10,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-BINARY_NAME=agent
+BINARY_NAME=pcdnagent
 
 all: build
 

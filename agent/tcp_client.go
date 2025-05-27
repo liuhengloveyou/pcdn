@@ -15,10 +15,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var conn net.Conn
+// var conn net.Conn
 
 func InitTcpClient(addr string) (err error) {
-	conn, err = net.Dial("tcp", addr)
+	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		Logger.Error("连接服务端失败", zap.Error(err))
 		return
@@ -83,10 +83,9 @@ func processWrite(conn net.Conn) {
 	defer ticker.Stop()
 
 	for {
-		_, err := conn.Write([]byte("heartbeat\n"))
-		fmt.Println("心跳发送:", err)
-		sendHeartbeat()
-		if err != nil {
+		// _, err := conn.Write([]byte("heartbeat\n"))
+
+		if err := sendHeartbeat(conn); err != nil {
 			return
 		}
 		<-ticker.C
@@ -111,12 +110,16 @@ func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
 }
 
 // 发送心跳
-func sendHeartbeat() error {
+func sendHeartbeat(conn net.Conn) error {
 	// 创建心跳包
 	heartbeat := &protos.Heartbeat{
-		Sn:        "sn-00000000001",
+		Sn:        "sn-000000001",
 		Ver:       Version,
 		Timestamp: time.Now().UnixMilli(),
+	}
+
+	if DeviceSN != nil && *DeviceSN != "" {
+		heartbeat.Sn = *DeviceSN
 	}
 
 	// 序列化为二进制数据
@@ -153,7 +156,7 @@ func sendHeartbeat() error {
 
 	}
 
-	Logger.Debug("心跳包发送成功")
+	Logger.Debug("sendHeartbeat OK: ", zap.Any("heartbeat", heartbeat))
 
 	return nil
 }

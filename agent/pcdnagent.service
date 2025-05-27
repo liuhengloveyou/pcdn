@@ -4,17 +4,17 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStartPre=/opt/pcdnagent/uid-sn.sh
-ExecStart=/opt/pcdnagent/agent_arm -A=xxx --vendor_prefix=xxx --sn_length=xx -isoutside=xx --remote=url
-WorkingDirectory=/opt/pcdnagent
+ExecStartPre=/opt/pcdnagent/sn.sh
+ExecStart=/opt/pcdnagent/pcdnagent
+WorkingDirectory=/opt/pcdnagent/
 Restart=always
 RestartSec=5
 User=root
 Group=root
 KillMode=process
 TimeoutStopSec=30
-StandardOutput=append:/var/log/pcdnagent.log
-StandardError=append:/var/log/pcdnagent.log
+StandardOutput=file:/var/log/pcdnagent.log
+StandardError=file:/var/log/pcdnagent.log
 
 [Install]
 WantedBy=multi-user.target

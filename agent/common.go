@@ -11,7 +11,7 @@ import (
 var Logger *zap.Logger
 
 func init() {
-	if e := InitLog("./logs/", "debug"); e != nil {
+	if e := InitLog("/opt/pcdnagent/logs/", "debug"); e != nil {
 		panic(e)
 	}
 }
@@ -24,7 +24,7 @@ func InitLog(logDir, logLevel string) error {
 		rotatelogs.WithRotationTime(time.Hour),
 	)
 
-	level := zapcore.DebugLevel
+	level := zapcore.InfoLevel
 	if e := level.UnmarshalText([]byte(logLevel)); e != nil {
 		return e
 	}
