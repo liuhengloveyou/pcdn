@@ -34,11 +34,11 @@ const columns = computed(() => props.table.getAllColumns()
         class="hidden h-8 ml-auto lg:flex"
       >
         <Settings2 class="w-4 h-4 mr-2" />
-        View
+        列显示
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="w-[150px]">
-      <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+      <DropdownMenuLabel>切换列显示</DropdownMenuLabel>
       <DropdownMenuSeparator />
 
       <DropdownMenuCheckboxItem

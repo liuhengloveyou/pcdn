@@ -27,7 +27,7 @@ defineProps<DataTablePaginationProps>()
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
         <p class="hidden text-sm font-medium line-clamp-1 md:block">
-          Rows per page
+          每页行数
         </p>
         <Select
           :model-value="`${table.getState().pagination.pageSize}`"
@@ -44,8 +44,8 @@ defineProps<DataTablePaginationProps>()
         </Select>
       </div>
       <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-        Page {{ table.getState().pagination.pageIndex + 1 }} of
-        {{ table.getPageCount() }}
+        第 {{ table.getState().pagination.pageIndex + 1 }} /
+        {{ table.getPageCount() }}页
       </div>
       <div class="flex items-center space-x-2">
         <Button

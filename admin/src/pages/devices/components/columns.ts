@@ -65,7 +65,9 @@ export const columns: ColumnDef<Device>[] = [
         return null
 
       return h('div', { class: 'flex w-[100px] items-center' }, [
-        status.icon && h(status.icon, { class: 'mr-2 h-4 w-4 text-muted-foreground' }),
+        status.icon && h(status.icon, { 
+          class: `mr-2 h-4 w-4 ${status.value === '在线' ? 'text-green-500' : 'text-red-500'}` 
+        }),
         h('span', status.label),
       ])
     },

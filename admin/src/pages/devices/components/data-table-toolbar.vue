@@ -22,13 +22,13 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
   <div class="flex items-center justify-between">
     <div class="flex flex-col items-start flex-1 space-y-2 md:items-center md:space-x-2 md:space-y-0 md:flex-row">
       <Input
-        placeholder="Filter tasks..."
+        placeholder="过滤..."
         :model-value="(table.getColumn('title')?.getFilterValue() as string) ?? ''"
         class="h-8 w-[150px] lg:w-[250px]"
         @input="table.getColumn('title')?.setFilterValue($event.target.value)"
       />
 
-      <div class="space-x-2">
+      <!-- <div class="space-x-2">
         <DataTableFacetedFilter
           v-if="table.getColumn('status')"
           :column="table.getColumn('status')"
@@ -41,7 +41,7 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
           title="Priority"
           :options="priorities"
         />
-      </div>
+      </div> -->
 
       <Button
         v-if="isFiltered"

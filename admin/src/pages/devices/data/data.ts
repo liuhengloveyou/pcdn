@@ -2,39 +2,42 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  CheckCircle,
   Circle,
   CircleCheck,
   CircleHelp,
+  CircleOff,
   CirclePlus,
   TimerOff,
+  Wifi,
 } from 'lucide-vue-next'
 import { h } from 'vue'
 
 export const labels = [
   {
-    value: 'bug',
-    label: 'Bug',
+    value: '优质设备',
+    label: '优质设备',
   },
   {
-    value: 'feature',
-    label: 'Feature',
+    value: '问题设备',
+    label: '问题设备',
   },
   {
-    value: 'documentation',
-    label: 'Documentation',
+    value: '移动设备',
+    label: '移动设备',
   },
 ]
 
 export const statuses = [
   {
-    value: 'backlog',
-    label: 'Backlog',
-    icon: h(CircleHelp),
+    value: "在线",
+    label: "在线",
+    icon: h(Wifi),
   },
   {
-    value: 'todo',
-    label: 'Todo',
-    icon: h(Circle),
+    value: "离线",
+    label: "离线",
+    icon: h(CircleOff),
   },
   {
     value: 'in progress',

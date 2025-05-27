@@ -72,22 +72,23 @@ const isOpen = ref(false)
       <DropdownMenuContent align="end" class="w-[160px]">
         <DialogTrigger as-child>
           <DropdownMenuItem @select.stop="handleSelect('edit')">
-            <span>Edit</span>
+            <span>编辑</span>
             <DropdownMenuShortcut> <FilePenLine class="w-4 h-4" /> </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DialogTrigger>
 
-        <DropdownMenuItem disabled>
+
+        <!-- <DropdownMenuItem disabled>
           Make a copy
         </DropdownMenuItem>
         <DropdownMenuItem disabled>
           Favorite
-        </DropdownMenuItem>
+        </DropdownMenuItem> -->
 
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuRadioGroup v-model="taskLabel">
               <DropdownMenuRadioItem v-for="label in labels" :key="label.value" :value="label.value">
@@ -101,7 +102,7 @@ const isOpen = ref(false)
 
         <DialogTrigger as-child>
           <DropdownMenuItem @select.stop="handleSelect('delete')">
-            <span>Delete</span>
+            <span>删除</span>
             <DropdownMenuShortcut> <Trash2 class="w-4 h-4" /> </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DialogTrigger>
