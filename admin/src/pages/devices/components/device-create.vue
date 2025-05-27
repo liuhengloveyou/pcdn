@@ -18,7 +18,7 @@ const isOpen = ref(false);
     </DialogTrigger>
 
     <DialogContent>
-      <TaskResourceDialog :task="null" @close="isOpen = false" />
+      <TaskResourceDialog :device="null" @close="isOpen = false" />
     </DialogContent>
   </Dialog>
 </template>

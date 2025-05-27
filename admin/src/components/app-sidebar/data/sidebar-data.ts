@@ -1,10 +1,7 @@
 import type { SidebarData, Team, User } from '../types'
-
 import { useSidebar } from '@/composables/use-sidebar'
-
 import {
   AudioWaveform,
-  Command,
   GalleryVerticalEnd,
 } from 'lucide-vue-next'
 
@@ -16,20 +13,20 @@ const user: User = {
 
 const teams: Team[] = [
   {
-    name: 'Acme Inc',
+    name: '智算未来 Inc',
     logo: GalleryVerticalEnd,
     plan: 'Enterprise',
   },
   {
-    name: 'Acme Corp.',
+    name: '智算未来 Corp.',
     logo: AudioWaveform,
     plan: 'Startup',
   },
-  {
-    name: 'Evil Corp.',
-    logo: Command,
-    plan: 'Free',
-  },
+  // {
+  //   name: 'Evil Corp.',
+  //   logo: Command,
+  //   plan: 'Free',
+  // },
 ]
 
 const { navData } = useSidebar()

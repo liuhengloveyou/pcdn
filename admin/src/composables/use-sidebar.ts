@@ -1,15 +1,10 @@
 import type { NavGroup } from '@/components/app-sidebar/types'
 import {
   BadgeHelp,
-  Boxes,
-  Bug,
   CreditCard,
   LayoutDashboard,
   ListTodo,
-  Podcast,
   Settings,
-  SquareUserRound,
-  Users,
 } from 'lucide-vue-next'
 import { ref } from 'vue'
 
@@ -18,7 +13,7 @@ export function useSidebar() {
 
   navData.value = [
     {
-      title: 'General',
+      title: '菜单',
       items: [
         {
           title: '仪表盘',
@@ -30,55 +25,55 @@ export function useSidebar() {
           url: '/devices',
           icon: ListTodo,
         },
-        {
-          title: 'Apps',
-          url: '/apps',
-          icon: Boxes,
-        },
-        {
-          title: 'Users',
-          url: '/users',
-          icon: Users,
-        },
-        {
-          title: 'Ai Talk Example',
-          url: '/ai-talk',
-          icon: Podcast,
-        },
+        // {
+        //   title: 'Apps',
+        //   url: '/apps',
+        //   icon: Boxes,
+        // },
+        // {
+        //   title: 'Users',
+        //   url: '/users',
+        //   icon: Users,
+        // },
+        // {
+        //   title: 'Ai Talk Example',
+        //   url: '/ai-talk',
+        //   icon: Podcast,
+        // },
       ],
     },
+    // {
+    //   title: 'Pages',
+    //   items: [
+    //     {
+    //       title: 'Auth',
+    //       icon: SquareUserRound,
+    //       items: [
+    //         { title: 'Sign In', url: '/auth/sign-in' },
+    //         { title: 'Sign In(2 Col)', url: '/auth/sign-in-2' },
+    //         { title: 'Sign Up', url: '/auth/sign-up' },
+    //         { title: 'Forgot Password', url: '/auth/forgot-password' },
+    //         { title: 'OTP', url: '/auth/otp' },
+    //       ],
+    //     },
+    //     {
+    //       title: 'Errors',
+    //       icon: Bug,
+    //       items: [
+    //         { title: '401 | Unauthorized', url: '/errors/401' },
+    //         { title: '403 | Forbidden', url: '/errors/403' },
+    //         { title: '404 | Not Found', url: '/errors/404' },
+    //         { title: '500 | Internal Server Error', url: '/errors/500' },
+    //         { title: '503 | Maintenance Error', url: '/errors/503' },
+    //       ],
+    //     },
+    //   ],
+    // },
     {
-      title: 'Pages',
+      title: '系统',
       items: [
         {
-          title: 'Auth',
-          icon: SquareUserRound,
-          items: [
-            { title: 'Sign In', url: '/auth/sign-in' },
-            { title: 'Sign In(2 Col)', url: '/auth/sign-in-2' },
-            { title: 'Sign Up', url: '/auth/sign-up' },
-            { title: 'Forgot Password', url: '/auth/forgot-password' },
-            { title: 'OTP', url: '/auth/otp' },
-          ],
-        },
-        {
-          title: 'Errors',
-          icon: Bug,
-          items: [
-            { title: '401 | Unauthorized', url: '/errors/401' },
-            { title: '403 | Forbidden', url: '/errors/403' },
-            { title: '404 | Not Found', url: '/errors/404' },
-            { title: '500 | Internal Server Error', url: '/errors/500' },
-            { title: '503 | Maintenance Error', url: '/errors/503' },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Other',
-      items: [
-        {
-          title: 'Settings',
+          title: '系统设置',
           icon: Settings,
           items: [
             { title: 'Profile', url: '/settings/' },
@@ -89,7 +84,7 @@ export function useSidebar() {
           ],
         },
         {
-          title: 'Help Center',
+          title: '帮助',
           url: '/help-center',
           icon: BadgeHelp,
         },

@@ -5,6 +5,7 @@ import DataTable from './components/data-table.vue'
 import DeviceCreate from './components/device-create.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { listDevice, type DeviceModel } from '@/services/DeviceService'
+import { toast } from 'vue-sonner'
 
 // 表格数据
 const devices = ref<DeviceModel[]>([]);
@@ -19,11 +20,12 @@ const totalItems = ref(0);
 // 搜索设备
 async function onLoad() {
   loading.value = true;
-  const resp = await listDevice({ page: currentPage, pageSize: pageSize });
+  const resp = await listDevice({ page: currentPage.value, pageSize: pageSize });
   loading.value = false;
-
+  toast.error('网络错误');
   console.log(resp);
   if (!resp) {
+    toast.error('网络错误');
     // $q.notify({
     //   color: 'negative',
     //   textColor: 'white',

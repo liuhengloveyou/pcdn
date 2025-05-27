@@ -18,12 +18,12 @@ import { addDevice, type DeviceModel } from "@/services/DeviceService";
 import type { Device } from "./columns";
 
 const props = defineProps<{
-  task: Device | null;
+  device: Device | null;
 }>();
-defineEmits(["close"]);
+const emit = defineEmits(["close"]);
 
-const task = computed(() => props.task);
-const title = computed(() => (task.value?.id ? `编程设备` : "添加设备"));
+const device = computed(() => props.device);
+const title = computed(() => (device.value?.id ? `编程设备` : "添加设备"));
 
 const formSchema = toTypedSchema(
   z.object({
@@ -31,7 +31,7 @@ const formSchema = toTypedSchema(
       .string()
       .min(2)
       .max(50)
-      .default(props.task?.sn ?? ""),
+      .default(props.device?.sn ?? ""),
   })
 );
 
@@ -70,6 +70,8 @@ async function onRealSubmit(val: DeviceModel) {
   // addDrawer.value = false;
 
   // await onLoad();
+
+  emit("close");
 }
 </script>
 
