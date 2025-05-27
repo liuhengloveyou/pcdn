@@ -38,7 +38,7 @@ onUnmounted(() => {
           <div class="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <GalleryVerticalEnd class-name="size-4" />
           </div>
-          智算PCDN管理系统
+          智算末来PCDN系统
         </a>
       </div>
       <div class="flex flex-1 items-center justify-center">
