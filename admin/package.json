@@ -33,6 +33,7 @@
     "zod": "^3.25.28"
   },
   "devDependencies": {
+    "@iconify-json/radix-icons": "^1.2.2",
     "@iconify/vue": "^5.0.0",
     "@types/node": "^22.15.21",
     "@vitejs/plugin-vue": "^5.2.3",

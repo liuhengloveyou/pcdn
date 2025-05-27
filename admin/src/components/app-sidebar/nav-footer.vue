@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/composables/use-auth";
+import router from "@/router";
 import {
   BadgeCheck,
   Bell,
@@ -28,7 +28,12 @@ import {
 
 const { user } = defineProps<{ user: User }>();
 
-const { logout } = useAuth();
+function logout() {
+  // 重新登录
+  document.cookie =
+    "trade-sess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;max-age=0";
+    router.replace({ path: "/login" });
+}
 </script>
 
 <template>
