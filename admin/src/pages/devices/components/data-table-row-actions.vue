@@ -55,6 +55,19 @@ function handleSelect(command: TCommand) {
   }
 }
 
+async function handleTC() {
+  console.log("reset pwd", props.row.getValue("sn"));
+
+  const resp = await api.post<HttpResponse>(`/api/device/tc`, {
+    sn: props.row.getValue("sn"),
+  });
+  if (resp.data.code === 0) {
+    toast.success("限速任务下发成功");
+  } else {
+    toast.error("限速任务下发失败");
+  }
+}
+
 async function handleResetPWD() {
   console.log("reset pwd", props.row.getValue("sn"));
 
@@ -86,66 +99,19 @@ async function handleResetPWD() {
         <DropdownMenuItem @select.stop="handleResetPWD">
           <span>重置密码</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>Profile</span>
+        <DropdownMenuItem @select.stop="handleTC">
+          <span>网卡限速</span>
           <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>Billing</span>
-          <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>Settings</span>
-          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>Keyboard shortcuts</span>
-          <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-        </DropdownMenuItem>
       </DropdownMenuGroup>
+
       <DropdownMenuSeparator />
-      <DropdownMenuGroup>
-        <DropdownMenuItem>
-          <span>Team</span>
-        </DropdownMenuItem>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <span>Invite users</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem>
-                <span>Email</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <span>Message</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <span>More...</span>
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
-        <DropdownMenuItem>
-          <span>New Team</span>
-          <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        <span>GitHub</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem>
-        <span>Support</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem disabled>
-        <span>API</span>
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        <span>Log out</span>
-        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+
+      <DropdownMenuItem @select.stop="handleSelect('delete')">
+        <span>删除</span>
+        <DropdownMenuShortcut>
+          <Trash2 class="w-4 h-4" />
+        </DropdownMenuShortcut>
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
@@ -195,16 +161,6 @@ async function handleResetPWD() {
       </DropdownMenuSub>
 
       <DialogTrigger as-child> </DialogTrigger>
-
-      <DropdownMenuSeparator />
-      <DialogTrigger as-child>
-        <DropdownMenuItem @select.stop="handleSelect('delete')">
-          <span>删除</span>
-          <DropdownMenuShortcut>
-            <Trash2 class="w-4 h-4" />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DialogTrigger>
     </DropdownMenuContent>
   </DropdownMenu>
 
