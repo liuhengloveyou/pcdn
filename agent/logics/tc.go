@@ -85,6 +85,7 @@ func LimitUploadBandwidth(ifaceName string, rateKbps uint32) error {
 		common.Logger.Error("add HTB qdisc ERR: ", zap.Error(err))
 		return err
 	}
+	common.Logger.Info("add HTB qdisc OK")
 
 	// 创建 HTB 类，限速 1Mbps
 	class := tc.Object{
@@ -113,29 +114,31 @@ func LimitUploadBandwidth(ifaceName string, rateKbps uint32) error {
 		fmt.Fprintf(os.Stderr, "无法添加HTB类: %v\n", err)
 		return err
 	}
+	common.Logger.Info("add class OK")
 
 	// 添加 SFQ 子队列确保公平排队
-	sfq := tc.Object{
-		Msg: tc.Msg{
-			Family:  unix.AF_UNSPEC,
-			Ifindex: uint32(ifaceIndex),
-			Handle:  core.BuildHandle(0x2, 0x0),
-			Parent:  core.BuildHandle(0x1, 0x1),
-		},
-		Attribute: tc.Attribute{
-			Kind: "sfq",
-			Sfq: &tc.Sfq{
-				V0: tc.SfqQopt{
-					Quantum:       1514,
-					PerturbPeriod: 100,
-				},
-			},
-		},
-	}
-	if err := tcnl.Qdisc().Add(&sfq); err != nil {
-		fmt.Fprintf(os.Stderr, "无法添加SFQ队列: %v\n", err)
-		return err
-	}
+	// sfq := tc.Object{
+	// 	Msg: tc.Msg{
+	// 		Family:  unix.AF_UNSPEC,
+	// 		Ifindex: uint32(ifaceIndex),
+	// 		Handle:  core.BuildHandle(0x2, 0x0),
+	// 		Parent:  core.BuildHandle(0x1, 0x1),
+	// 	},
+	// 	Attribute: tc.Attribute{
+	// 		Kind: "sfq",
+	// 		Sfq: &tc.Sfq{
+	// 			V0: tc.SfqQopt{
+	// 				Quantum:       1514,
+	// 				PerturbPeriod: 100,
+	// 			},
+	// 		},
+	// 	},
+	// }
+	// if err := tcnl.Qdisc().Add(&sfq); err != nil {
+	// 	common.Logger.Error("add SFQ ERR", zap.Error(err))
+	// 	return err
+	// }
+	common.Logger.Info("add sfq OK")
 
 	// 添加过滤器将所有流量导向 HTB 类
 	classID := core.BuildHandle(0x1, 0x1)
@@ -159,9 +162,10 @@ func LimitUploadBandwidth(ifaceName string, rateKbps uint32) error {
 		},
 	}
 	if err := tcnl.Filter().Add(&filter); err != nil {
-		fmt.Fprintf(os.Stderr, "无法添加过滤器: %v\n", err)
+		common.Logger.Error("add filter ERR", zap.Error(err))
 		return err
 	}
+	common.Logger.Info("add filter OK")
 
 	return nil
 }
