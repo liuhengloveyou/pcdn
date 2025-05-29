@@ -52,23 +52,26 @@ func (s *deviceService) Find(uid uint64, page, pageSize int) ([]models.DeviceMod
 	// 查状态
 	keys := make([]string, len(result))
 	for i := 0; i < len(result); i++ {
-		keys[i] = fmt.Sprintf("agent:%s", result[i].SN)
+		keys[i] = fmt.Sprintf("agent/%s", result[i].SN)
 	}
 
-	status, err := common.RedisClient.MGet(context.Background(), keys...).Result()
-	if err != nil {
-		logger.Error("deviceService.Find redis ERR: ", zap.Error(err))
-		return nil, 0, common.ErrService
-	}
+	if len(keys) > 0 {
+		status, err := common.RedisClient.MGet(context.Background(), keys...).Result()
+		logger.Debug("deviceService.Find redis: ", zap.Any("status", status), zap.Error(err))
+		if err != nil {
+			logger.Error("deviceService.Find redis ERR: ", zap.Error(err))
+			return nil, 0, common.ErrService
+		}
 
-	for i := 0; i < len(status); i++ {
-		if status[i] != nil {
-			var agentInfo models.DeviceModel
-			if err := json.Unmarshal([]byte(status[i].(string)), &agentInfo); err == nil {
-				result[i].LastHeartbear = agentInfo.LastHeartbear
-				result[i].Version = agentInfo.Version
-				result[i].RemoteAddr = agentInfo.RemoteAddr
+		for i := 0; i < len(status); i++ {
+			if status[i] != nil {
+				var agentInfo models.DeviceModel
+				if err := json.Unmarshal([]byte(status[i].(string)), &agentInfo); err == nil {
+					result[i].LastHeartbear = agentInfo.LastHeartbear
+					result[i].Version = agentInfo.Version
+					result[i].RemoteAddr = agentInfo.RemoteAddr
 
+				}
 			}
 		}
 	}

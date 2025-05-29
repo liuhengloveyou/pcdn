@@ -95,9 +95,9 @@ func main() {
 		fmt.Println("Failed to update app:", err)
 	}
 
-	if err := limitUploadBandwidth("ens33", 1); err != nil {
-		fmt.Fprintf(os.Stderr, "限制带宽失败: %v\n", err)
-	}
+	// if err := limitUploadBandwidth("ens33", 1); err != nil {
+	// 	fmt.Fprintf(os.Stderr, "限制带宽失败: %v\n", err)
+	// }
 
 	if tcpServer == nil || *tcpServer == "" {
 		fmt.Println("tcp_server is nil")

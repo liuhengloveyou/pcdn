@@ -4,6 +4,4 @@
 killall -9 pcdn-server &>/dev/null
 sleep 1
 
-./pcdn-server &
-
-
+nohup ./pcdn-server &

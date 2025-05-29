@@ -27,8 +27,8 @@ type MsgType int32
 const (
 	MsgType_MSG_TYPE_UNKNOWN   MsgType = 0 // 未知类型
 	MsgType_MSG_TYPE_HEARTBEAT MsgType = 1 // 心跳消息
-	MsgType_MSG_TYPE_GET_TASK  MsgType = 2 // 获取任务
-	MsgType_MSG_TYPE_TASK_RESP MsgType = 3 // 任务响应
+	MsgType_MSG_TYPE_TASK      MsgType = 2 // 任务
+	MsgType_MSG_TYPE_TASKRESP  MsgType = 3 // 任务应答
 )
 
 // Enum value maps for MsgType.
@@ -36,14 +36,14 @@ var (
 	MsgType_name = map[int32]string{
 		0: "MSG_TYPE_UNKNOWN",
 		1: "MSG_TYPE_HEARTBEAT",
-		2: "MSG_TYPE_GET_TASK",
-		3: "MSG_TYPE_TASK_RESP",
+		2: "MSG_TYPE_TASK",
+		3: "MSG_TYPE_TASKRESP",
 	}
 	MsgType_value = map[string]int32{
 		"MSG_TYPE_UNKNOWN":   0,
 		"MSG_TYPE_HEARTBEAT": 1,
-		"MSG_TYPE_GET_TASK":  2,
-		"MSG_TYPE_TASK_RESP": 3,
+		"MSG_TYPE_TASK":      2,
+		"MSG_TYPE_TASKRESP":  3,
 	}
 )
 
@@ -72,6 +72,53 @@ func (x MsgType) Number() protoreflect.EnumNumber {
 // Deprecated: Use MsgType.Descriptor instead.
 func (MsgType) EnumDescriptor() ([]byte, []int) {
 	return file_tcp_proto_rawDescGZIP(), []int{0}
+}
+
+// 消息类型枚举
+type TaskType int32
+
+const (
+	TaskType_TASK_TYPE_UNKNOWN  TaskType = 0 // 未知类型
+	TaskType_TASK_TYPE_RESETPWD TaskType = 1 // 重置密码
+)
+
+// Enum value maps for TaskType.
+var (
+	TaskType_name = map[int32]string{
+		0: "TASK_TYPE_UNKNOWN",
+		1: "TASK_TYPE_RESETPWD",
+	}
+	TaskType_value = map[string]int32{
+		"TASK_TYPE_UNKNOWN":  0,
+		"TASK_TYPE_RESETPWD": 1,
+	}
+)
+
+func (x TaskType) Enum() *TaskType {
+	p := new(TaskType)
+	*p = x
+	return p
+}
+
+func (x TaskType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TaskType) Descriptor() protoreflect.EnumDescriptor {
+	return file_tcp_proto_enumTypes[1].Descriptor()
+}
+
+func (TaskType) Type() protoreflect.EnumType {
+	return &file_tcp_proto_enumTypes[1]
+}
+
+func (x TaskType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TaskType.Descriptor instead.
+func (TaskType) EnumDescriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{1}
 }
 
 type Heartbeat struct {
@@ -211,32 +258,34 @@ func (x *DeviceAgent) GetLastHeartbear() int64 {
 }
 
 // 任务结构体
-type TaskStruct struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	TaskId        string                 `protobuf:"bytes,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	TaskType      string                 `protobuf:"bytes,3,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
-	Payload       string                 `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
-	HostName      string                 `protobuf:"bytes,5,opt,name=host_name,json=hostName,proto3" json:"host_name,omitempty"`
-	Port          string                 `protobuf:"bytes,6,opt,name=port,proto3" json:"port,omitempty"` // RespChan字段被省略，因为它是一个通道类型，不适合在protobuf中表示
+type Task struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	TaskId     string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	TaskType   TaskType               `protobuf:"varint,2,opt,name=task_type,json=taskType,proto3,enum=protos.TaskType" json:"task_type,omitempty"`
+	Timestamp  int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Sn         string                 `protobuf:"bytes,4,opt,name=sn,proto3" json:"sn,omitempty"`                                   // 设备SN
+	AccessName string                 `protobuf:"bytes,5,opt,name=access_name,json=accessName,proto3" json:"access_name,omitempty"` // 接入服务名
+	// 重置密码字段
+	Username      string `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
+	Pwd           string `protobuf:"bytes,7,opt,name=pwd,proto3" json:"pwd,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TaskStruct) Reset() {
-	*x = TaskStruct{}
+func (x *Task) Reset() {
+	*x = Task{}
 	mi := &file_tcp_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TaskStruct) String() string {
+func (x *Task) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TaskStruct) ProtoMessage() {}
+func (*Task) ProtoMessage() {}
 
-func (x *TaskStruct) ProtoReflect() protoreflect.Message {
+func (x *Task) ProtoReflect() protoreflect.Message {
 	mi := &file_tcp_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -248,94 +297,56 @@ func (x *TaskStruct) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TaskStruct.ProtoReflect.Descriptor instead.
-func (*TaskStruct) Descriptor() ([]byte, []int) {
+// Deprecated: Use Task.ProtoReflect.Descriptor instead.
+func (*Task) Descriptor() ([]byte, []int) {
 	return file_tcp_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *TaskStruct) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *TaskStruct) GetTaskId() string {
+func (x *Task) GetTaskId() string {
 	if x != nil {
 		return x.TaskId
 	}
 	return ""
 }
 
-func (x *TaskStruct) GetTaskType() string {
+func (x *Task) GetTaskType() TaskType {
 	if x != nil {
 		return x.TaskType
 	}
-	return ""
+	return TaskType_TASK_TYPE_UNKNOWN
 }
 
-func (x *TaskStruct) GetPayload() string {
+func (x *Task) GetTimestamp() int64 {
 	if x != nil {
-		return x.Payload
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Task) GetSn() string {
+	if x != nil {
+		return x.Sn
 	}
 	return ""
 }
 
-func (x *TaskStruct) GetHostName() string {
+func (x *Task) GetAccessName() string {
 	if x != nil {
-		return x.HostName
+		return x.AccessName
 	}
 	return ""
 }
 
-func (x *TaskStruct) GetPort() string {
+func (x *Task) GetUsername() string {
 	if x != nil {
-		return x.Port
+		return x.Username
 	}
 	return ""
 }
 
-// 任务请求
-type TaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TaskReq) Reset() {
-	*x = TaskReq{}
-	mi := &file_tcp_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TaskReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TaskReq) ProtoMessage() {}
-
-func (x *TaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_tcp_proto_msgTypes[3]
+func (x *Task) GetPwd() string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TaskReq.ProtoReflect.Descriptor instead.
-func (*TaskReq) Descriptor() ([]byte, []int) {
-	return file_tcp_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *TaskReq) GetName() string {
-	if x != nil {
-		return x.Name
+		return x.Pwd
 	}
 	return ""
 }
@@ -343,17 +354,19 @@ func (x *TaskReq) GetName() string {
 // 任务响应
 type TaskResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	TaskId        string                 `protobuf:"bytes,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	TaskType      string                 `protobuf:"bytes,3,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
-	Resp          string                 `protobuf:"bytes,4,opt,name=resp,proto3" json:"resp,omitempty"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	TaskType      TaskType               `protobuf:"varint,2,opt,name=task_type,json=taskType,proto3,enum=protos.TaskType" json:"task_type,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Sn            string                 `protobuf:"bytes,4,opt,name=sn,proto3" json:"sn,omitempty"`                                   // 设备SN
+	AccessName    string                 `protobuf:"bytes,5,opt,name=access_name,json=accessName,proto3" json:"access_name,omitempty"` // 接入服务名
+	Resp          string                 `protobuf:"bytes,6,opt,name=resp,proto3" json:"resp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TaskResp) Reset() {
 	*x = TaskResp{}
-	mi := &file_tcp_proto_msgTypes[4]
+	mi := &file_tcp_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -365,7 +378,7 @@ func (x *TaskResp) String() string {
 func (*TaskResp) ProtoMessage() {}
 
 func (x *TaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_tcp_proto_msgTypes[4]
+	mi := &file_tcp_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -378,14 +391,7 @@ func (x *TaskResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResp.ProtoReflect.Descriptor instead.
 func (*TaskResp) Descriptor() ([]byte, []int) {
-	return file_tcp_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *TaskResp) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
+	return file_tcp_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *TaskResp) GetTaskId() string {
@@ -395,9 +401,30 @@ func (x *TaskResp) GetTaskId() string {
 	return ""
 }
 
-func (x *TaskResp) GetTaskType() string {
+func (x *TaskResp) GetTaskType() TaskType {
 	if x != nil {
 		return x.TaskType
+	}
+	return TaskType_TASK_TYPE_UNKNOWN
+}
+
+func (x *TaskResp) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *TaskResp) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+func (x *TaskResp) GetAccessName() string {
+	if x != nil {
+		return x.AccessName
 	}
 	return ""
 }
@@ -424,27 +451,32 @@ const file_tcp_proto_rawDesc = "" +
 	"\vremote_addr\x18\x03 \x01(\tR\n" +
 	"remoteAddr\x12\x1c\n" +
 	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12%\n" +
-	"\x0elast_heartbear\x18\x05 \x01(\x03R\rlastHeartbear\"\xa1\x01\n" +
-	"\n" +
-	"TaskStruct\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x17\n" +
-	"\atask_id\x18\x02 \x01(\tR\x06taskId\x12\x1b\n" +
-	"\ttask_type\x18\x03 \x01(\tR\btaskType\x12\x18\n" +
-	"\apayload\x18\x04 \x01(\tR\apayload\x12\x1b\n" +
-	"\thost_name\x18\x05 \x01(\tR\bhostName\x12\x12\n" +
-	"\x04port\x18\x06 \x01(\tR\x04port\"\x1d\n" +
-	"\aTaskReq\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"h\n" +
-	"\bTaskResp\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x17\n" +
-	"\atask_id\x18\x02 \x01(\tR\x06taskId\x12\x1b\n" +
-	"\ttask_type\x18\x03 \x01(\tR\btaskType\x12\x12\n" +
-	"\x04resp\x18\x04 \x01(\tR\x04resp*f\n" +
+	"\x0elast_heartbear\x18\x05 \x01(\x03R\rlastHeartbear\"\xcb\x01\n" +
+	"\x04Task\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12-\n" +
+	"\ttask_type\x18\x02 \x01(\x0e2\x10.protos.TaskTypeR\btaskType\x12\x1c\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x12\x0e\n" +
+	"\x02sn\x18\x04 \x01(\tR\x02sn\x12\x1f\n" +
+	"\vaccess_name\x18\x05 \x01(\tR\n" +
+	"accessName\x12\x1a\n" +
+	"\busername\x18\x06 \x01(\tR\busername\x12\x10\n" +
+	"\x03pwd\x18\a \x01(\tR\x03pwd\"\xb5\x01\n" +
+	"\bTaskResp\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12-\n" +
+	"\ttask_type\x18\x02 \x01(\x0e2\x10.protos.TaskTypeR\btaskType\x12\x1c\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x12\x0e\n" +
+	"\x02sn\x18\x04 \x01(\tR\x02sn\x12\x1f\n" +
+	"\vaccess_name\x18\x05 \x01(\tR\n" +
+	"accessName\x12\x12\n" +
+	"\x04resp\x18\x06 \x01(\tR\x04resp*a\n" +
 	"\aMsgType\x12\x14\n" +
 	"\x10MSG_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
-	"\x12MSG_TYPE_HEARTBEAT\x10\x01\x12\x15\n" +
-	"\x11MSG_TYPE_GET_TASK\x10\x02\x12\x16\n" +
-	"\x12MSG_TYPE_TASK_RESP\x10\x03B'Z%github.com/liuhengloveyou/pcdn/protosb\x06proto3"
+	"\x12MSG_TYPE_HEARTBEAT\x10\x01\x12\x11\n" +
+	"\rMSG_TYPE_TASK\x10\x02\x12\x15\n" +
+	"\x11MSG_TYPE_TASKRESP\x10\x03*9\n" +
+	"\bTaskType\x12\x15\n" +
+	"\x11TASK_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
+	"\x12TASK_TYPE_RESETPWD\x10\x01B'Z%github.com/liuhengloveyou/pcdn/protosb\x06proto3"
 
 var (
 	file_tcp_proto_rawDescOnce sync.Once
@@ -458,22 +490,24 @@ func file_tcp_proto_rawDescGZIP() []byte {
 	return file_tcp_proto_rawDescData
 }
 
-var file_tcp_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_tcp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_tcp_proto_goTypes = []any{
 	(MsgType)(0),        // 0: protos.MsgType
-	(*Heartbeat)(nil),   // 1: protos.Heartbeat
-	(*DeviceAgent)(nil), // 2: protos.DeviceAgent
-	(*TaskStruct)(nil),  // 3: protos.TaskStruct
-	(*TaskReq)(nil),     // 4: protos.TaskReq
+	(TaskType)(0),       // 1: protos.TaskType
+	(*Heartbeat)(nil),   // 2: protos.Heartbeat
+	(*DeviceAgent)(nil), // 3: protos.DeviceAgent
+	(*Task)(nil),        // 4: protos.Task
 	(*TaskResp)(nil),    // 5: protos.TaskResp
 }
 var file_tcp_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protos.Task.task_type:type_name -> protos.TaskType
+	1, // 1: protos.TaskResp.task_type:type_name -> protos.TaskType
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_tcp_proto_init() }
@@ -486,8 +520,8 @@ func file_tcp_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tcp_proto_rawDesc), len(file_tcp_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   5,
+			NumEnums:      2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

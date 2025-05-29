@@ -1,4 +1,5 @@
 pid: "/tmp/pcdn.pid"
+access_name: "pcdn-server-01" # 每个接入点一个名字，不能空
 log_dir: "./logs/" # 日志目录
 log_level: "debug"
 http_server_addr: ":10000"

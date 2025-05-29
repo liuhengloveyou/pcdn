@@ -38,6 +38,7 @@ var (
 
 type ConfigStruct struct {
 	PID            string `yaml:"pid"`
+	AccessName     string `yaml:"access_name"`
 	Host           string `yaml:"host"`
 	HttpServerAddr string `yaml:"http_server_addr"`
 	TcpServerAddr  string `yaml:"tcp_server_addr"`
@@ -59,6 +60,9 @@ type ConfigStruct struct {
 func init() {
 	if e := gocommon.LoadYamlConfig(*confile, &ServConfig); e != nil {
 		panic(e)
+	}
+	if ServConfig.AccessName == "" {
+		panic("access_name is empty")
 	}
 
 	if e := InitLog(ServConfig.LogDir, ServConfig.LogLevel); e != nil {

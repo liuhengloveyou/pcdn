@@ -3,9 +3,7 @@ package tcpservice
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -91,10 +89,8 @@ func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
 	switch msgType {
 	case uint32(protos.MsgType_MSG_TYPE_HEARTBEAT):
 		return processHeartbeatMsg(conn, msgByte)
-	// case MSGTYPE_GETTASK:
-	// 	return processGetTaskMsg(conn, msgByte)
-	// case MSGTYPE_TASKRESP:
-	// 	processGetTaskRespMsg(conn, msgByte)
+	case uint32(protos.MsgType_MSG_TYPE_TASKRESP):
+		return processGetTaskRespMsg(conn, msgByte)
 	default:
 		common.Logger.Error("processOneMsg type ERR: ", zap.Uint32("msgType", msgType))
 	}
@@ -121,13 +117,14 @@ func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
 			RemoteAddr: remoteAddr,
 		}
 		AgentMap[req.Sn] = tmpDevice
-	} else {
-		tmpDevice.SN = req.Sn
-		tmpDevice.Version = req.Ver
-		tmpDevice.RemoteAddr = remoteAddr
-		tmpDevice.Timestamp = req.Timestamp
-		tmpDevice.LastHeartbear = time.Now().UnixMilli()
 	}
+
+	tmpDevice.SN = req.Sn
+	tmpDevice.Version = req.Ver
+	tmpDevice.RemoteAddr = remoteAddr
+	tmpDevice.Timestamp = req.Timestamp
+	tmpDevice.LastHeartbear = time.Now().UnixMilli()
+	tmpDevice.ClientTcpConn = conn
 
 	// 更新Redis中的Agent状态
 	if err := updateAgentStatusToRedis(tmpDevice); err != nil {
@@ -169,39 +166,41 @@ func sendHeartbeat(conn net.Conn, msg *protos.Heartbeat) error {
 	return nil
 }
 
-func SendTask(csmm *protos.DeviceAgent, task *protos.TaskStruct) error {
-	// for i := 0; i < 10 && csmm.NcConn == nil; i++ {
-	// 	time.Sleep(time.Second)
-	// 	continue // 通手机联上来取任务
-	// }
+func SendTaskToDevice(device *models.DeviceModel, task *protos.Task) error {
+	for i := 0; i < 10; i++ {
+		if device.ClientTcpConn != nil {
+			break
+		}
 
-	// if csmm.NcConn == nil {
-	// 	return fmt.Errorf("下发任务超时")
-	// }
+		time.Sleep(time.Second)
+		continue // 等设备联上来取任务
+	}
 
-	// conn := *csmm.NcConn
+	if device.ClientTcpConn == nil {
+		return fmt.Errorf("下发任务超时")
+	}
 
-	// taskByte, err := json.Marshal(task)
-	// if err != nil {
-	// 	return err
-	// }
+	taskByte, err := proto.Marshal(task)
+	if err != nil {
+		return err
+	}
 
-	// buff := bytes.NewBuffer([]byte("\r\n"))
-	// if err := binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_HEARTBEAT)); err != nil {
-	// 	return err
-	// }
-	// if err := binary.Write(buff, binary.LittleEndian, uint32(len(taskByte))); err != nil {
-	// 	return err
-	// }
-	// if n, err := buff.Write(taskByte); n != len(taskByte) || err != nil {
-	// 	return err
-	// }
+	buff := bytes.NewBuffer([]byte("\r\n"))
+	if err := binary.Write(buff, binary.LittleEndian, uint32(protos.MsgType_MSG_TYPE_TASK)); err != nil {
+		return err
+	}
+	if err := binary.Write(buff, binary.LittleEndian, uint32(len(taskByte))); err != nil {
+		return err
+	}
+	if n, err := buff.Write(taskByte); n != len(taskByte) || err != nil {
+		return err
+	}
 
-	// if n, err := conn.Write(buff.Bytes()); n != buff.Len() || err != nil {
-	// 	conn.Close()
-	// 	csmm.NcConn = nil // 重联
-	// 	return err
-	// }
+	if n, err := device.ClientTcpConn.Write(buff.Bytes()); n != buff.Len() || err != nil {
+		device.ClientTcpConn.Close()
+		device.ClientTcpConn = nil // 重联
+		return err
+	}
 
 	return nil
 }
@@ -227,7 +226,7 @@ func processGetTaskMsg(conn net.Conn, msgByte []byte) error {
 	return nil
 }
 
-func processGetTaskRespMsg(conn net.Conn, msgByte []byte) {
+func processGetTaskRespMsg(conn net.Conn, msgByte []byte) error {
 	common.Logger.Sugar().Debugf("processGetTaskRespMsg: %v %v\n", conn.RemoteAddr(), string(msgByte))
 
 	// var resp protos.TaskResp
@@ -260,32 +259,6 @@ func processGetTaskRespMsg(conn net.Conn, msgByte []byte) {
 	// } else {
 	// 	// TODO
 	// }
-}
-
-func updateAgentStatusToRedis(agent *models.DeviceModel) error {
-	// 将Agent信息序列化为JSON
-	agentJSON, err := json.Marshal(agent)
-	if err != nil {
-		return fmt.Errorf("序列化Agent信息失败: %v", err)
-	}
-
-	// 使用Redis客户端将数据保存到Redis
-	// 使用agent的SN作为键
-	key := fmt.Sprintf("agent:%s", agent.SN)
-
-	// 设置数据到Redis，并设置过期时间（例如30分钟）
-	ctx := context.Background()
-	err = common.RedisClient.Set(ctx, key, string(agentJSON), 30*time.Minute).Err()
-	if err != nil {
-		return fmt.Errorf("保存Agent信息到Redis失败: %v", err)
-	}
-
-	// 同时更新一个集合，用于列出所有在线的Agent
-	// TODO 过期清理
-	err = common.RedisClient.SAdd(ctx, "agents:online", agent.SN).Err()
-	if err != nil {
-		common.Logger.Sugar().Warnf("更新在线Agent集合失败: %v", err)
-	}
 
 	return nil
 }
