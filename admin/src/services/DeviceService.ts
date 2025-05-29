@@ -12,7 +12,7 @@ export interface DeviceModel {
   timestamp: number;
   lastHeartbear: number;
 
-  lastHeartbearStr?: string;
+  lastHeartbearStr: string;
   status?: string;
 }
 

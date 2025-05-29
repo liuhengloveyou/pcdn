@@ -50,6 +50,7 @@ const onSubmit = handleSubmit((values) => {
     version: "",
     timestamp: 0,
     lastHeartbear: 0,
+    lastHeartbearStr: '',
   });
 });
 

@@ -19,6 +19,7 @@ export const deviceSchema = z.object({
   version: z.string(),
   timestamp: z.number(),
   lastHeartbear: z.number(),
+  lastHeartbearStr: z.string(),
 })
 
 export type Device = z.infer<typeof deviceSchema>
@@ -76,7 +77,7 @@ export const columns: ColumnDef<Device>[] = [
     },
   },
   {
-    accessorKey: 'last_heartbear_str',
+    accessorKey: 'lastHeartbearStr',
     header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '最后活跃时间' }),
     cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('lastHeartbearStr')),
     enableSorting: true,
