@@ -15,10 +15,10 @@ export const deviceSchema = z.object({
   sn: z.string(),
   createTime: z.number(),
   updateTime: z.number(),
-  remote_addr: z.string(),
+  remoteAddr: z.string(),
   version: z.string(),
   timestamp: z.number(),
-  last_heartbear: z.number(),
+  lastHeartbear: z.number(),
 })
 
 export type Device = z.infer<typeof deviceSchema>

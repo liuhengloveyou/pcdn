@@ -7,12 +7,12 @@ export interface DeviceModel {
   sn: string;
   createTime: number;
   updateTime: number;
-  remote_addr: string;
+  remoteAddr: string;
   version: string;
   timestamp: number;
-  last_heartbear: number;
+  lastHeartbear: number;
 
-  last_heartbear_str?: string;
+  lastHeartbearStr?: string;
   status?: string;
 }
 
@@ -44,3 +44,4 @@ export function updateDevice(id: number, data: DeviceModel) {
 export function deleteDevice(id: number) {
   return api.delete(`/api/device/delete/${id}`);
 }
+

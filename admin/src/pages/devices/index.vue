@@ -36,12 +36,14 @@ async function onLoad() {
 
   if (resp.code === 0 && resp.data) {
     for (let i = 0; i < resp.data.length; i++) {
-      resp.data[i]!.status = Date.now() - resp.data[i]!.last_heartbear <= 60000 ? '在线' : '离线';
-      resp.data[i]!.last_heartbear_str = new Date(resp.data[i]!.last_heartbear).toLocaleString(); // 转换时间戳为可读格式
-      // resp.data[i]!.version = "0.0.1"
+      resp.data[i]!.status = Date.now() - resp.data[i]!.lastHeartbear <= 60000 ? '在线' : '离线';
+      resp.data[i]!.lastHeartbearStr = new Date(resp.data[i]!.lastHeartbear).toLocaleString(); // 转换时间戳为可读格式
     }
 
     totalItems.value = resp.total as number;
+
+    console.log(resp.data);
+    
     devices.value = resp.data;
   }
 }
