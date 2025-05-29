@@ -78,7 +78,7 @@ export const columns: ColumnDef<Device>[] = [
   {
     accessorKey: 'last_heartbear_str',
     header: ({ column }) => h(DataTableColumnHeader<Device>, { column, title: '最后活跃时间' }),
-    cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('last_heartbear_str')),
+    cell: ({ row }) => h('div', { class: 'w-20' }, row.getValue('lastHeartbearStr')),
     enableSorting: true,
     enableHiding: true,
   },
