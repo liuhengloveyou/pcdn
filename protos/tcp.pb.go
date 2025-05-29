@@ -80,6 +80,7 @@ type TaskType int32
 const (
 	TaskType_TASK_TYPE_UNKNOWN  TaskType = 0 // 未知类型
 	TaskType_TASK_TYPE_RESETPWD TaskType = 1 // 重置密码
+	TaskType_TASK_TYPE_TC       TaskType = 2 // 网卡限速
 )
 
 // Enum value maps for TaskType.
@@ -87,10 +88,12 @@ var (
 	TaskType_name = map[int32]string{
 		0: "TASK_TYPE_UNKNOWN",
 		1: "TASK_TYPE_RESETPWD",
+		2: "TASK_TYPE_TC",
 	}
 	TaskType_value = map[string]int32{
 		"TASK_TYPE_UNKNOWN":  0,
 		"TASK_TYPE_RESETPWD": 1,
+		"TASK_TYPE_TC":       2,
 	}
 )
 
@@ -473,10 +476,11 @@ const file_tcp_proto_rawDesc = "" +
 	"\x10MSG_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
 	"\x12MSG_TYPE_HEARTBEAT\x10\x01\x12\x11\n" +
 	"\rMSG_TYPE_TASK\x10\x02\x12\x15\n" +
-	"\x11MSG_TYPE_TASKRESP\x10\x03*9\n" +
+	"\x11MSG_TYPE_TASKRESP\x10\x03*K\n" +
 	"\bTaskType\x12\x15\n" +
 	"\x11TASK_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
-	"\x12TASK_TYPE_RESETPWD\x10\x01B'Z%github.com/liuhengloveyou/pcdn/protosb\x06proto3"
+	"\x12TASK_TYPE_RESETPWD\x10\x01\x12\x10\n" +
+	"\fTASK_TYPE_TC\x10\x02B'Z%github.com/liuhengloveyou/pcdn/protosb\x06proto3"
 
 var (
 	file_tcp_proto_rawDescOnce sync.Once

@@ -14,6 +14,38 @@ import (
 	"go.uber.org/zap"
 )
 
+func TrifficLimit(sn string) (*protos.Task, error) {
+	if sn == "" {
+		return nil, common.ErrParam
+	}
+
+	agentStat, err := getAgentStatusFromRedis(sn)
+	if err != nil {
+		return nil, err
+	}
+	common.Logger.Debug("TrifficLimit agentStat: ", zap.Any("stat", agentStat))
+	if agentStat.AccessName == "" {
+		return nil, common.ErrAgentNoAccess
+	}
+
+	now := time.Now().UnixMilli()
+	task := &protos.Task{
+		TaskId:     fmt.Sprintf("%d", now),
+		TaskType:   protos.TaskType_TASK_TYPE_TC,
+		Timestamp:  now,                  // 当前时间
+		Sn:         sn,                   // 设备SN
+		AccessName: agentStat.AccessName, // 接入服务名
+	}
+
+	err = NewTaskToRedis(task)
+	if err != nil {
+		common.Logger.Error("TrifficLimit NewTaskToRedis ERR: ", zap.Error(err), zap.Any("stat", task), zap.Any("stat", agentStat))
+		return nil, err
+	}
+
+	return task, nil
+}
+
 func ResetDevicePWD(sn string) (*protos.Task, error) {
 	if sn == "" {
 		return nil, common.ErrParam

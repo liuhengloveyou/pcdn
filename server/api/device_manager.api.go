@@ -34,6 +34,13 @@ func initDeviceManagerApi() {
 		NeedLogin: true,
 	}
 
+	// 网卡限速
+	Apis["/device/tc"] = ApiStruct{
+		Handler:   TrifficLimit,
+		Method:    "POST",
+		NeedLogin: true,
+	}
+
 	// 重置密码
 	Apis["/device/resetpwd"] = ApiStruct{
 		Handler:   ResetDevicePWD,
@@ -146,6 +153,34 @@ func UpdateAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gocommon.HttpErr(w, http.StatusOK, 0, "OK")
+}
+
+func TrifficLimit(w http.ResponseWriter, r *http.Request) {
+	sessionUser := ReadSessionFromRequest(r)
+	if sessionUser == nil || sessionUser.UID <= 0 {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrNoAuth)
+		return
+	}
+
+	req := models.DeviceModel{}
+	if err := common.ReadJsonBodyFromRequest(r, &req, ""); err != nil {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrParam)
+		return
+	}
+
+	if req.SN == "" {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrParam)
+		return
+	}
+	common.Logger.Debug("TrifficLimit", zap.Any("device", req), zap.Any("sess", sessionUser))
+
+	task, err := tcpservice.TrifficLimit(req.SN)
+	if err != nil {
+		gocommon.HttpErr(w, http.StatusOK, -1, common.ErrService)
+		return
+	}
+
+	gocommon.HttpErr(w, http.StatusOK, 0, task.GetTaskId())
 }
 
 // 重置密码

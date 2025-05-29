@@ -31,3 +31,4 @@ server/pcdn-server
 server/log
 server/log.passport
 agent/logs/
+agent/pcdnagent.gz
