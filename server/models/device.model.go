@@ -1,16 +1,25 @@
 package models
 
+import "net"
+
 type DeviceModel struct {
 	Model
 
 	// 设备SN
-	SN         string `json:"sn" gorm:"column:sn;index:idx_sn;type:VARCHAR(45);"`
-	Version    string `json:"version" gorm:"-"`
-	RemoteAddr string `json:"remote_addr" gorm:"-"`
+	SN string `json:"sn" gorm:"column:sn;index:idx_sn;type:VARCHAR(45);"`
+	// agent 版本
+	Version string `json:"version" gorm:"-"`
+	// 设备IP
+	RemoteAddr string `json:"remoteAddr" gorm:"-"`
 	// 最后心跳时间
-	LastHeartbear int64 `json:"last_heartbear" gorm:"-"`
+	LastHeartbear int64 `json:"lastHeartbear" gorm:"-"`
 	// 设备心跳带上来的时间
 	Timestamp int64 `json:"timestamp" gorm:"-"`
+	// 接入点名
+	AccessName string `json:"accessName" gorm:"-"`
+
+	//设备tcp长连接
+	ClientTcpConn net.Conn `json:"-" gorm:"-"`
 }
 
 func (DeviceModel) TableName() string {

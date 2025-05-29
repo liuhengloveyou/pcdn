@@ -11,9 +11,7 @@ import (
 	"pcdn-server/tcpservice"
 
 	gocommon "github.com/liuhengloveyou/go-common"
-	passportprotos "github.com/liuhengloveyou/passport/protos"
 	"go.uber.org/zap"
-	"gopkg.in/guregu/null.v4/zero"
 )
 
 func initDeviceManagerApi() {
@@ -21,13 +19,13 @@ func initDeviceManagerApi() {
 	Apis["/device/add"] = ApiStruct{
 		Handler:   AddDevice,
 		Method:    "POST",
-		NeedLogin: false,
+		NeedLogin: true,
 	}
 
 	Apis["/device/list"] = ApiStruct{
 		Handler:   ListDevices,
 		Method:    "GET",
-		NeedLogin: false,
+		NeedLogin: true,
 	}
 
 	Apis["/device/update"] = ApiStruct{
@@ -36,19 +34,17 @@ func initDeviceManagerApi() {
 		NeedLogin: true,
 	}
 
+	// 重置密码
+	Apis["/device/resetpwd"] = ApiStruct{
+		Handler:   ResetDevicePWD,
+		Method:    "GET",
+		NeedLogin: true,
+	}
 }
 
 // 添加设备
 func AddDevice(w http.ResponseWriter, r *http.Request) {
 	sessionUser := ReadSessionFromRequest(r)
-
-	/////
-	name := zero.StringFrom("admin")
-	sessionUser = &passportprotos.User{
-		UID:      1,
-		Nickname: &name,
-	}
-
 	if sessionUser == nil || sessionUser.UID <= 0 {
 		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrNoAuth)
 		return
@@ -77,14 +73,8 @@ func AddDevice(w http.ResponseWriter, r *http.Request) {
 // 列出设备
 func ListDevices(w http.ResponseWriter, r *http.Request) {
 	sessionUser := ReadSessionFromRequest(r)
-	/////TODO
-	name := zero.StringFrom("admin")
-	sessionUser = &passportprotos.User{
-		UID:      1,
-		Nickname: &name,
-	}
-
 	if sessionUser == nil || sessionUser.UID <= 0 {
+		common.Logger.Error("session ERR:", zap.Any("sess", sessionUser))
 		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrNoAuth)
 		return
 	}
@@ -156,4 +146,31 @@ func UpdateAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gocommon.HttpErr(w, http.StatusOK, 0, "OK")
+}
+
+// 重置密码
+func ResetDevicePWD(w http.ResponseWriter, r *http.Request) {
+	sessionUser := ReadSessionFromRequest(r)
+	if sessionUser == nil || sessionUser.UID <= 0 {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrNoAuth)
+		return
+	}
+
+	r.ParseForm()
+	sn := r.FormValue("sn")
+	if sn == "" {
+		common.Logger.Error("ResetDevicePWD param ERR: ", zap.String("sn", sn), zap.Any("sess", sessionUser))
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrParam)
+		return
+	}
+
+	common.Logger.Debug("ResetDevicePWD", zap.String("sn", sn), zap.Any("sess", sessionUser))
+
+	task, err := tcpservice.ResetDevicePWD(sn)
+	if err != nil {
+		gocommon.HttpErr(w, http.StatusOK, -1, "请求手机出错")
+		return
+	}
+
+	gocommon.HttpErr(w, http.StatusOK, 0, task.GetTaskId())
 }

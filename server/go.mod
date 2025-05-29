@@ -15,7 +15,11 @@ require (
 	gorm.io/gorm v1.26.1
 )
 
-require google.golang.org/protobuf v1.36.6 // indirect
+require (
+	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/qiniu/go-sdk/v7 v7.25.3 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect

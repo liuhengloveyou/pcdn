@@ -24,9 +24,7 @@ func ReadTcpTask(conn net.Conn) {
 	// defer conn.Close()
 	time.Sleep(time.Second * 3)
 
-	taskRep := protos.TaskReq{
-		Name: "testing",
-	}
+	taskRep := protos.Task{}
 	taskRepByte, _ := json.Marshal(taskRep)
 
 	buff := bytes.NewBuffer([]byte("\r\n"))

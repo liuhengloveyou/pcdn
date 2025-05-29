@@ -118,7 +118,7 @@ func (p *HttpApiServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadSessionFromRequest(r *http.Request) (sessionUser *passportprotos.User) {
-	sessionStr := r.Header.Get("session")
+	sessionStr := r.Header.Get("go-sess")
 	if sessionStr != "" {
 		sessionUserJson := struct {
 			Data passportprotos.User `json:"data"`
@@ -132,14 +132,13 @@ func ReadSessionFromRequest(r *http.Request) (sessionUser *passportprotos.User) 
 		return &sessionUserJson.Data
 	}
 
-	// sessUser := passport.GetSessionUser(r)
-	// if sessUser.UID <= 0 {
-	// 	Logger.Errorf("passport.GetSessionUser ERR: %#v\n", sessUser)
-	// 	return
-	// }
+	sessUser := passport.GetSessionUser(r)
+	if sessUser.UID <= 0 {
+		Logger.Errorf("passport.GetSessionUser ERR: %#v\n", sessUser)
+		return
+	}
 
-	// return &sessUser
-	return nil
+	return &sessUser
 }
 
 func uploadImgByForm(w http.ResponseWriter, r *http.Request) {

@@ -5,7 +5,7 @@ make
 
 # /d/upx.exe ./server
 
-scp ./pcdn-server root@101.37.182.58:/opt/pcdn/pcdn-server
+scp ./pcdn-server root@101.37.182.58:/opt/pcdn/server/pcdn-server
 # scp ./server root@67.223.117.146:/opt/pcdn-server/pcdn-server/server
 # rm ./server
 
