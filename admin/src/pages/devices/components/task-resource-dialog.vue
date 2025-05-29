@@ -46,10 +46,10 @@ const onSubmit = handleSubmit((values) => {
     sn: values.sn,
     createTime: 0,
     updateTime: 0,
-    remote_addr: "",
+    remoteAddr: "",
     version: "",
     timestamp: 0,
-    last_heartbear: 0,
+    lastHeartbear: 0,
   });
 });
 

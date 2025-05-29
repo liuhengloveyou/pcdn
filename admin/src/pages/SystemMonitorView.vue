@@ -31,15 +31,20 @@ use([
 // 模拟数据
 const cpuUsage = ref(0)
 const memoryUsage = ref(0)
-const networkSpeed = ref([])
+// 在script setup部分添加类型定义
+interface NetworkSpeed {
+  upload: number;
+  download: number;
+}
+
+const networkSpeed = ref<NetworkSpeed[]>([]);
 const diskUsage = ref([])
 
 // 添加CPU和内存的历史数据数组
-const cpuHistory = ref([])
-const memoryHistory = ref([])
+const timeData = ref<string[]>([]);
+const cpuHistory = ref<number[]>([]);
+const memoryHistory = ref<number[]>([]);
 
-// 时间轴数据
-const timeData = ref([])
 
 // 更新间隔（毫秒）
 const updateInterval = 2000
@@ -267,11 +272,11 @@ const updateData = () => {
   // 初始化硬盘使用情况（只在第一次更新时设置）
   if (diskUsage.value.length === 0) {
     diskUsage.value = [
-      { value: 120, name: '系统 (C:)' },
-      { value: 234, name: '数据 (D:)' },
-      { value: 335, name: '备份 (E:)' },
-      { value: 148, name: '媒体 (F:)' },
-      { value: 548, name: '可用空间' }
+      // { value: 120, name: '系统 (C:)' },
+      // { value: 234, name: '数据 (D:)' },
+      // { value: 335, name: '备份 (E:)' },
+      // { value: 148, name: '媒体 (F:)' },
+      // { value: 548, name: '可用空间' }
     ]
   }
 }
