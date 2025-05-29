@@ -16,6 +16,7 @@ enum MsgType {
 enum TaskType {
   TASK_TYPE_UNKNOWN = 0;     // 未知类型
   TASK_TYPE_RESETPWD = 1;   // 重置密码
+  TASK_TYPE_TC = 2;         // 网卡限速
 }
 
 message Heartbeat {

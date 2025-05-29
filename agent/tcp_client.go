@@ -50,7 +50,7 @@ func processRead(conn net.Conn) {
 
 			break
 		}
-		common.Logger.Sugar().Debug("read tcp: %v %v %s %v\n", conn.RemoteAddr(), n, string(buf[:n]), err)
+		common.Logger.Debug("read tcp: ", zap.String("addr", conn.RemoteAddr().String()), zap.Any("n", n), zap.Error(err))
 
 		dn, err := data.Write(buf[:n])
 		if dn != n || err != nil {
@@ -234,6 +234,9 @@ func processTaskMsg(conn net.Conn, msgByte []byte) error {
 	if task.TaskType == protos.TaskType_TASK_TYPE_RESETPWD {
 		// 重置密码
 		err = logics.ResetRootPWD(task.Username, task.Pwd)
+	} else if task.TaskType == protos.TaskType_TASK_TYPE_TC {
+		// 网卡限速
+		err = logics.LimitUploadBandwidth("eth0", 10)
 	}
 
 	if err != nil {
