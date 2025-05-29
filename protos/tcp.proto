@@ -45,6 +45,10 @@ message Task {
   // 重置密码字段
   string username = 6;
   string pwd = 7;
+
+  // 网上限速
+  string iface_name = 8;
+  string rate = 9;
 }
 
 

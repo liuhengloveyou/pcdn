@@ -1,4 +1,4 @@
-VERSION=0.0.3
+VERSION=0.0.4
 BUILD_TIME=$(shell date "+%FZ%T")
 COMMIT_SHA1=$(shell git rev-parse HEAD)
 GIT_TAG=$(shell git describe --abbrev=0 --always)

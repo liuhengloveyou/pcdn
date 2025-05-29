@@ -269,8 +269,11 @@ type Task struct {
 	Sn         string                 `protobuf:"bytes,4,opt,name=sn,proto3" json:"sn,omitempty"`                                   // 设备SN
 	AccessName string                 `protobuf:"bytes,5,opt,name=access_name,json=accessName,proto3" json:"access_name,omitempty"` // 接入服务名
 	// 重置密码字段
-	Username      string `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
-	Pwd           string `protobuf:"bytes,7,opt,name=pwd,proto3" json:"pwd,omitempty"`
+	Username string `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
+	Pwd      string `protobuf:"bytes,7,opt,name=pwd,proto3" json:"pwd,omitempty"`
+	// 网上限速
+	IfaceName     string `protobuf:"bytes,8,opt,name=iface_name,json=ifaceName,proto3" json:"iface_name,omitempty"`
+	Rate          string `protobuf:"bytes,9,opt,name=rate,proto3" json:"rate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -350,6 +353,20 @@ func (x *Task) GetUsername() string {
 func (x *Task) GetPwd() string {
 	if x != nil {
 		return x.Pwd
+	}
+	return ""
+}
+
+func (x *Task) GetIfaceName() string {
+	if x != nil {
+		return x.IfaceName
+	}
+	return ""
+}
+
+func (x *Task) GetRate() string {
+	if x != nil {
+		return x.Rate
 	}
 	return ""
 }
@@ -454,7 +471,7 @@ const file_tcp_proto_rawDesc = "" +
 	"\vremote_addr\x18\x03 \x01(\tR\n" +
 	"remoteAddr\x12\x1c\n" +
 	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12%\n" +
-	"\x0elast_heartbear\x18\x05 \x01(\x03R\rlastHeartbear\"\xcb\x01\n" +
+	"\x0elast_heartbear\x18\x05 \x01(\x03R\rlastHeartbear\"\xfe\x01\n" +
 	"\x04Task\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12-\n" +
 	"\ttask_type\x18\x02 \x01(\x0e2\x10.protos.TaskTypeR\btaskType\x12\x1c\n" +
@@ -463,7 +480,10 @@ const file_tcp_proto_rawDesc = "" +
 	"\vaccess_name\x18\x05 \x01(\tR\n" +
 	"accessName\x12\x1a\n" +
 	"\busername\x18\x06 \x01(\tR\busername\x12\x10\n" +
-	"\x03pwd\x18\a \x01(\tR\x03pwd\"\xb5\x01\n" +
+	"\x03pwd\x18\a \x01(\tR\x03pwd\x12\x1d\n" +
+	"\n" +
+	"iface_name\x18\b \x01(\tR\tifaceName\x12\x12\n" +
+	"\x04rate\x18\t \x01(\tR\x04rate\"\xb5\x01\n" +
 	"\bTaskResp\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12-\n" +
 	"\ttask_type\x18\x02 \x01(\x0e2\x10.protos.TaskTypeR\btaskType\x12\x1c\n" +

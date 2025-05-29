@@ -35,6 +35,10 @@ func TrifficLimit(sn string) (*protos.Task, error) {
 		Timestamp:  now,                  // 当前时间
 		Sn:         sn,                   // 设备SN
 		AccessName: agentStat.AccessName, // 接入服务名
+
+		// 限速
+		IfaceName: "eth0",
+		Rate:      "1mbps",
 	}
 
 	err = NewTaskToRedis(task)

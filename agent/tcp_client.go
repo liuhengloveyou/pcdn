@@ -236,7 +236,7 @@ func processTaskMsg(conn net.Conn, msgByte []byte) error {
 		err = logics.ResetRootPWD(task.Username, task.Pwd)
 	} else if task.TaskType == protos.TaskType_TASK_TYPE_TC {
 		// 网卡限速
-		logics.ApplyTCRules("eth0", "10kbps")
+		logics.ApplyTCRules(task.IfaceName, task.Rate)
 	}
 
 	if err != nil {
