@@ -38,7 +38,7 @@ func TrifficLimit(sn string) (*protos.Task, error) {
 
 		// 限速
 		IfaceName: "eth0",
-		Rate:      "1mbps",
+		Rate:      "5mbps",
 	}
 
 	err = NewTaskToRedis(task)

