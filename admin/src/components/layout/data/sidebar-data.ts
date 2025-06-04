@@ -17,7 +17,7 @@ export const sidebarData: SidebarData = {
     {
       name: '智算 PCDN 管理系统',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
+      plan: '为您提供一站式的PCDN服务',
     }
   ],
   navGroups: [

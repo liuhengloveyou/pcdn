@@ -31,7 +31,7 @@ export function NetworkLimitDialog({
   device,
 }: NetworkLimitDialogProps) {
   const [uploadLimit, setUploadLimit] = useState('')
-  const [downloadLimit, setDownloadLimit] = useState('')
+  // const [downloadLimit, setDownloadLimit] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   // 模拟当前限速规则数据
@@ -45,8 +45,8 @@ export function NetworkLimitDialog({
   const handleSubmit = async () => {
     if (!device || !device.sn) return
 
-    if (!uploadLimit || !downloadLimit) {
-      toast.error('请填写上传和下载限速值')
+    if (!uploadLimit) {
+      toast.error('请填写上行限速值')
       return
     }
 
@@ -57,7 +57,7 @@ export function NetworkLimitDialog({
         deviceId: device?.id,
         sn: device?.sn,
         uploadLimit: uploadLimit + ' Mbps',
-        downloadLimit: downloadLimit + ' Mbps',
+        // downloadLimit: downloadLimit + ' Mbps',
       })
 
       const respone = await api.post<HttpResponse>(`/api/device/tc`, {
@@ -73,7 +73,7 @@ export function NetworkLimitDialog({
 
       onOpenChange(false)
       setUploadLimit('')
-      setDownloadLimit('')
+      // setDownloadLimit('')
     } catch (error) {
       console.error('更新失败:', error)
       toast.error('更新失败，请重试')

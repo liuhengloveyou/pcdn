@@ -3,8 +3,6 @@ import { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DataTableViewOptions } from '../components/data-table-view-options'
-import { priorities, statuses } from '../data/data'
-import { DataTableFacetedFilter } from './data-table-faceted-filter'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -26,7 +24,7 @@ export function DataTableToolbar<TData>({
           }
           className='h-8 w-[150px] lg:w-[250px]'
         />
-        <div className='flex gap-x-2'>
+        {/* <div className='flex gap-x-2'>
           {table.getColumn('status') && (
             <DataTableFacetedFilter
               column={table.getColumn('status')}
@@ -41,7 +39,7 @@ export function DataTableToolbar<TData>({
               options={priorities}
             />
           )}
-        </div>
+        </div> */}
         {isFiltered && (
           <Button
             variant='ghost'

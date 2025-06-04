@@ -32,6 +32,15 @@ export const columns: ColumnDef<DeviceModel>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: 'id',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='ID' />
+    ),
+    cell: ({ row }) => <div className='w-[6px]'>{row.getValue('id')}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: 'sn',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='设备SN' />
@@ -57,9 +66,17 @@ export const columns: ColumnDef<DeviceModel>[] = [
       return (
         <div className='flex w-[100px] items-center'>
           {status.icon && (
-            <status.icon className='text-muted-foreground mr-2 h-4 w-4' />
+            <status.icon 
+              className={`mr-2 h-4 w-4 ${
+                status.value === "在线" ? "text-green-500" : "text-gray-500"
+              }`} 
+            />
           )}
-          <span>{status.label}</span>
+          <span className={`font-medium ${
+            status.value === "在线" ? "text-green-600" : "text-gray-500"
+          }`}>
+            {status.label}
+          </span>
         </div>
       )
     },
@@ -72,18 +89,7 @@ export const columns: ColumnDef<DeviceModel>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='版本' />
     ),
-    cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label)
-
-      return (
-        <div className='flex space-x-2'>
-          {label && <Badge variant='outline'>{label.label}</Badge>}
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('version')}
-          </span>
-        </div>
-      )
-    },
+    cell: ({ row }) => <div className='w-[80px]'>{row.getValue('version')}</div>,
   },
   {
     accessorKey: 'lastHeartbearStr',
