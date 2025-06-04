@@ -32,3 +32,4 @@ server/log
 server/log.passport
 agent/logs/
 agent/pcdnagent.gz
+admin-vue/
