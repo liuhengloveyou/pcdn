@@ -7,6 +7,7 @@ import (
 	"pcdn-server/common"
 	"pcdn-server/models"
 	"pcdn-server/repos"
+	"strings"
 
 	passportprotos "github.com/liuhengloveyou/passport/protos"
 	"go.uber.org/zap"
@@ -21,6 +22,8 @@ func (s *deviceService) Create(sessionUser *passportprotos.User, req *models.Dev
 		return 0, common.ErrParam
 	}
 	req.UserId = sessionUser.UID
+	req.SN = strings.ToUpper(req.SN)
+
 	id, err := repos.DeviceRepo.Create(req)
 	if err != nil {
 		logger.Error("deviceService.Create ERR: ", zap.Error(err))
@@ -52,7 +55,7 @@ func (s *deviceService) Find(uid uint64, page, pageSize int) ([]models.DeviceMod
 	// 查状态
 	keys := make([]string, len(result))
 	for i := 0; i < len(result); i++ {
-		keys[i] = fmt.Sprintf("agent/%s", result[i].SN)
+		keys[i] = fmt.Sprintf("agent/%s", strings.ToUpper(result[i].SN))
 	}
 
 	if len(keys) > 0 {

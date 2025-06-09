@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"pcdn-server/common"
+	"strings"
 	"time"
 
 	"github.com/liuhengloveyou/pcdn/protos"
@@ -47,6 +48,7 @@ func sendTaskToDeviceTask() {
 		}
 
 		// 找TCP连接
+		taskJson.Sn = strings.ToUpper(taskJson.Sn)
 		tmpAgent, ok := AgentMap[taskJson.Sn]
 		if !ok {
 			common.Logger.Error("sendTaskToDeviceTask ERR ", zap.Any("task", taskJson.String()))

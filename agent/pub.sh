@@ -7,4 +7,6 @@ make arm
 
 # scp -P 58779 sn.sh pcdnagent.sh pcdnagent pcdnagent.service root@10.10.10.100:/opt/pcdnagent/
 # scp -P 58779 sn.sh pcdnagent.sh pcdnagent pcdnagent.service root@10.10.10.129:/opt/pcdnagent/
-scp -P 58779 sn.sh pcdnagent.sh pcdnagent pcdnagent.service root@10.10.10.102:/opt/pcdnagent/
+# scp -P 58779 sn.sh pcdnagent.sh pcdnagent pcdnagent.service root@10.10.10.110:/opt/pcdnagent/
+
+scp -P 55555 sn.sh pcdnagent.sh pcdnagent pcdnagent.service root@10.10.10.162:/opt/pcdnagent/

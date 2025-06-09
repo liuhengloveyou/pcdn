@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"pcdn-server/common"
@@ -128,6 +129,7 @@ func UpdateAgent(w http.ResponseWriter, r *http.Request) {
 		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrParam)
 		return
 	}
+	sn = strings.ToUpper(sn)
 
 	agentOne := tcpservice.AgentMap[sn]
 	if agentOne == nil {

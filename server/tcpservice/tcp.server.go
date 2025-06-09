@@ -108,6 +108,7 @@ func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
 	}
 	common.Logger.Debug("heartbeat: ", zap.Any("req", req))
 
+	req.Sn = strings.ToUpper(req.Sn)
 	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
 	tmpDevice := AgentMap[req.Sn]
 	if tmpDevice == nil {

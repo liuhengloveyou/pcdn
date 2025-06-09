@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"pcdn-server/common"
@@ -58,5 +59,5 @@ func updateAgentStatusToRedis(agent *models.DeviceModel) error {
 }
 
 func snToKey(sn string) string {
-	return fmt.Sprintf("%s%s", AGENT_KEY_PREFIX, sn)
+	return fmt.Sprintf("%s%s", AGENT_KEY_PREFIX, strings.ToUpper(sn))
 }

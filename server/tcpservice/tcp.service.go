@@ -5,6 +5,7 @@ package tcpservice
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"pcdn-server/common"
@@ -18,6 +19,7 @@ func TrifficLimit(sn string) (*protos.Task, error) {
 	if sn == "" {
 		return nil, common.ErrParam
 	}
+	sn = strings.ToUpper(sn)
 
 	agentStat, err := getAgentStatusFromRedis(sn)
 	if err != nil {
@@ -54,6 +56,7 @@ func ResetDevicePWD(sn string) (*protos.Task, error) {
 	if sn == "" {
 		return nil, common.ErrParam
 	}
+	sn = strings.ToUpper(sn)
 
 	agentStat, err := getAgentStatusFromRedis(sn)
 	if err != nil {
