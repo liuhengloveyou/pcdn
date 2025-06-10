@@ -29,9 +29,6 @@ export default function Users() {
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>账号列表</h2>
-            <p className='text-muted-foreground'>
-              在这里管理您的用户及其角色。
-            </p>
           </div>
           <UsersPrimaryButtons />
         </div>

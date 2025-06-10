@@ -1,6 +1,7 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
-import { IconEdit, IconLock, IconTrash, IconWifi } from '@tabler/icons-react'
+// 首先在导入部分添加新图标
+import { IconEdit, IconLock, IconTrash, IconWifi, IconChartLine } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -76,6 +77,18 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow({ ...task, label: task.label || '' })
+            setOpen('system-monitor')
+          }}
+        >
+          系统监控
+          <DropdownMenuShortcut>
+            <IconChartLine size={16} />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => {

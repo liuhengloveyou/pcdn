@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Device } from '../data/schema.ts'
 
-type TasksDialogType = 'create' | 'update' | 'delete' | 'import' | 'network-limit' | 'reset-password'
+type TasksDialogType = 'create' | 'update' | 'delete' | 'import' | 'network-limit' | 'reset-password' | 'system-monitor'
 
 interface TasksContextType {
   open: TasksDialogType | null

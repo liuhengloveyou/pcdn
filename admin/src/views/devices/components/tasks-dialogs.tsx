@@ -8,6 +8,7 @@ import { useTasks } from '../context/tasks-context'
 import { NetworkLimitDialog } from './network-limit-dialog'
 import { TasksImportDialog } from './tasks-import-dialog'
 import { TasksMutateDrawer } from './tasks-mutate-drawer'
+import SystemMonitorDrawer from './system-monitor'
 
 export function TasksDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useTasks()
@@ -80,6 +81,15 @@ export function TasksDialogs() {
             device={currentRow}
           />
 
+      <SystemMonitorDrawer
+        open={open === 'system-monitor'}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setOpen(null)
+          }
+        }}
+        device={currentRow}
+      />
           <ConfirmDialog
             key='task-delete'
             destructive
