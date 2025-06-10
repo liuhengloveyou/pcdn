@@ -120,7 +120,7 @@ func sendHeartbeat(conn net.Conn) error {
 	}
 
 	if DeviceSN != nil && *DeviceSN != "" {
-		heartbeat.Sn = *DeviceSN
+		heartbeat.Sn = strings.ToUpper(*DeviceSN)
 	}
 
 	// 序列化为二进制数据

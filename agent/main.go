@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"pcdnagent/logics"
 	"syscall"
 	"time"
 
@@ -70,6 +71,8 @@ func sigHandler() {
 func main() {
 	flag.Parse()
 	sigHandler()
+
+	logics.PS()
 
 	if *showVer {
 		fmt.Printf("%s\t%s\n", Version, BuildTime)
