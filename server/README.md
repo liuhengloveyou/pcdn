@@ -51,6 +51,8 @@
 sudo -i -u postgres
 psql  # 进入 SQL 交互终端
 
+psql -U pcdn -d pcdn
+
 -- 创建新用户和密码
 CREATE USER pcdn WITH PASSWORD 'pcdn12321';
 
