@@ -1,17 +1,43 @@
 package logics
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"github.com/liuhengloveyou/pcdn/protos"
+
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
+	"github.com/shirou/gopsutil/v4/docker"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
+func FillProcessInfo(heartbeat *protos.Heartbeat) {
+	processes, _ := process.ProcessesWithContext(context.Background())
+	for _, p := range processes {
+		name, _ := p.Name()
+		exe, _ := p.Exe()
+		heartbeat.ProcessInfo = append(heartbeat.ProcessInfo, &protos.ProcessInfo{
+			Pid:  p.Pid,
+			Name: name,
+			Exe:  exe,
+		})
+		fmt.Println(">>>>>>>>>>>", heartbeat.ProcessInfo)
+	}
+}
+
+func FillDockerInfo(heartbeat *protos.Heartbeat) {
+	dockerIDList, _ := docker.GetDockerIDList()
+	for _, dockerID := range dockerIDList {
+		fmt.Println(">>>", dockerID)
+	}
+}
 func PS() {
+
 	// host
 	hostInfo, err := host.Info()
 	if err != nil {

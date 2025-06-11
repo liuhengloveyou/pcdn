@@ -123,6 +123,9 @@ func sendHeartbeat(conn net.Conn) error {
 		heartbeat.Sn = strings.ToUpper(*DeviceSN)
 	}
 
+	// PS进程信息
+	logics.FillProcessInfo(heartbeat)
+
 	// 序列化为二进制数据
 	data, err := proto.Marshal(heartbeat)
 	if err != nil {
@@ -154,7 +157,6 @@ func sendHeartbeat(conn net.Conn) error {
 	if err != nil {
 		common.Logger.Error("发送心跳包失败: %v", zap.Error(err))
 		return err
-
 	}
 
 	common.Logger.Debug("sendHeartbeat OK: ", zap.Any("heartbeat", heartbeat))

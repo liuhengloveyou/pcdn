@@ -59,6 +59,6 @@ require (
 )
 
 replace (
-	github.com/liuhengloveyou/go-selfupdate => ../../dev/go-selfupdate/
+	github.com/liuhengloveyou/go-selfupdate => ../../go-selfupdate/
 	github.com/liuhengloveyou/pcdn/protos => ../protos/
 )

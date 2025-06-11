@@ -71,6 +71,7 @@ func AddDevice(w http.ResponseWriter, r *http.Request) {
 
 	id, err := service.DeviceService.Create(sessionUser, &req)
 	if err != nil {
+		common.Logger.Error("AddDevice", zap.Error(err))
 		gocommon.HttpJsonErr(w, http.StatusOK, err)
 		return
 	}

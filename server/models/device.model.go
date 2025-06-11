@@ -6,7 +6,7 @@ type DeviceModel struct {
 	Model
 
 	// 设备SN
-	SN string `json:"sn" gorm:"column:sn;index:idx_sn;type:VARCHAR(45);"`
+	SN string `json:"sn" gorm:"column:sn;uniqueIndex:idx_sn;type:VARCHAR(45);"`
 	// agent 版本
 	Version string `json:"version" gorm:"-"`
 	// 设备IP

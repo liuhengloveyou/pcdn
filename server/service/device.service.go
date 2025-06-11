@@ -23,16 +23,21 @@ func (s *deviceService) Create(sessionUser *passportprotos.User, req *models.Dev
 	}
 	req.UserId = sessionUser.UID
 	req.SN = strings.ToUpper(req.SN)
+	common.Logger.Debug("deviceService.Create", zap.Any("sess", sessionUser), zap.Any("req", req))
 
 	id, err := repos.DeviceRepo.Create(req)
 	if err != nil {
 		logger.Error("deviceService.Create ERR: ", zap.Error(err))
+		// 检查是否是唯一键约束错误
+		if strings.Contains(err.Error(), "duplicate key") {
+			return 0, common.ErrAgentSNExists
+		}
 		return 0, common.ErrService
 	}
 
 	// 可选：记录业务日志
 	log := &models.BusinessLog{
-		UserName:     sessionUser.Nickname.String,
+		UserName:     sessionUser.Cellphone.String,
 		BusinessType: models.BUSINESS_TYPE_CREATE_DEVICE,
 		Payload:      fmt.Sprintf("%v", id),
 	}

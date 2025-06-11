@@ -101,35 +101,41 @@ func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
 }
 
 func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
-	var req protos.Heartbeat
-	if err := proto.Unmarshal(msgByte, &req); err != nil {
+	var heartbeat protos.Heartbeat
+	if err := proto.Unmarshal(msgByte, &heartbeat); err != nil {
 		common.Logger.Sugar().Errorf("heartbeat err: ", string(msgByte), err)
 		return err
 	}
-	common.Logger.Debug("heartbeat: ", zap.Any("req", req))
+	common.Logger.Debug("heartbeat: ", zap.Any("heartbeat", heartbeat))
 
-	req.Sn = strings.ToUpper(req.Sn)
+	heartbeat.Sn = strings.ToUpper(heartbeat.Sn)
 	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
-	tmpDevice := AgentMap[req.Sn]
+	tmpDevice := AgentMap[heartbeat.Sn]
 	if tmpDevice == nil {
 		tmpDevice = &models.DeviceModel{
-			SN:         req.Sn,
-			Version:    req.Ver,
+			SN:         heartbeat.Sn,
+			Version:    heartbeat.Ver,
 			RemoteAddr: remoteAddr,
 		}
-		AgentMap[req.Sn] = tmpDevice
+		AgentMap[heartbeat.Sn] = tmpDevice
 	}
 
-	tmpDevice.SN = req.Sn
-	tmpDevice.Version = req.Ver
+	tmpDevice.SN = heartbeat.Sn
+	tmpDevice.Version = heartbeat.Ver
 	tmpDevice.RemoteAddr = remoteAddr
-	tmpDevice.Timestamp = req.Timestamp
+	tmpDevice.Timestamp = heartbeat.Timestamp
 	tmpDevice.LastHeartbear = time.Now().UnixMilli()
 	tmpDevice.ClientTcpConn = conn
 
 	// 更新Redis中的Agent状态
 	if err := updateAgentStatusToRedis(tmpDevice); err != nil {
-		common.Logger.Sugar().Errorf("更新Agent状态到Redis失败: %v", err)
+		common.Logger.Error("updateAgentStatusToRedis ERR: ", zap.Error(err))
+	}
+	// 更新Redis中的Agent监控信息
+	if len(heartbeat.ProcessInfo) > 0 {
+		if err := updateAgentProcessToRedis(heartbeat.Sn, heartbeat.ProcessInfo); err != nil {
+			common.Logger.Error("updateAgentProcessToRedis ERR: ", zap.Error(err))
+		}
 	}
 
 	sendHeartbeat(conn, &protos.Heartbeat{

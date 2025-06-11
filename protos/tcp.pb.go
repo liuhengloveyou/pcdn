@@ -125,10 +125,14 @@ func (TaskType) EnumDescriptor() ([]byte, []int) {
 }
 
 type Heartbeat struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sn            string                 `protobuf:"bytes,1,opt,name=sn,proto3" json:"sn,omitempty"`
-	Ver           string                 `protobuf:"bytes,2,opt,name=ver,proto3" json:"ver,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 添加时间戳字段，使用int64类型表示Unix时间戳
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Sn        string                 `protobuf:"bytes,1,opt,name=sn,proto3" json:"sn,omitempty"`
+	Ver       string                 `protobuf:"bytes,2,opt,name=ver,proto3" json:"ver,omitempty"`
+	Timestamp int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 使用int64类型表示Unix时间戳
+	// 进程信息
+	ProcessInfo []*ProcessInfo `protobuf:"bytes,4,rep,name=process_info,json=processInfo,proto3" json:"process_info,omitempty"`
+	// docker信息
+	DockerInfo    []*DockerInfo `protobuf:"bytes,5,rep,name=docker_info,json=dockerInfo,proto3" json:"docker_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -182,6 +186,20 @@ func (x *Heartbeat) GetTimestamp() int64 {
 		return x.Timestamp
 	}
 	return 0
+}
+
+func (x *Heartbeat) GetProcessInfo() []*ProcessInfo {
+	if x != nil {
+		return x.ProcessInfo
+	}
+	return nil
+}
+
+func (x *Heartbeat) GetDockerInfo() []*DockerInfo {
+	if x != nil {
+		return x.DockerInfo
+	}
+	return nil
 }
 
 type DeviceAgent struct {
@@ -456,15 +474,123 @@ func (x *TaskResp) GetResp() string {
 	return ""
 }
 
+// 设备进程信息
+type ProcessInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pid           int32                  `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Exe           string                 `protobuf:"bytes,3,opt,name=exe,proto3" json:"exe,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProcessInfo) Reset() {
+	*x = ProcessInfo{}
+	mi := &file_tcp_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProcessInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProcessInfo) ProtoMessage() {}
+
+func (x *ProcessInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProcessInfo.ProtoReflect.Descriptor instead.
+func (*ProcessInfo) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ProcessInfo) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+func (x *ProcessInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ProcessInfo) GetExe() string {
+	if x != nil {
+		return x.Exe
+	}
+	return ""
+}
+
+type DockerInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DockerInfo) Reset() {
+	*x = DockerInfo{}
+	mi := &file_tcp_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DockerInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DockerInfo) ProtoMessage() {}
+
+func (x *DockerInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DockerInfo.ProtoReflect.Descriptor instead.
+func (*DockerInfo) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DockerInfo) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 var File_tcp_proto protoreflect.FileDescriptor
 
 const file_tcp_proto_rawDesc = "" +
 	"\n" +
-	"\ttcp.proto\x12\x06protos\"K\n" +
+	"\ttcp.proto\x12\x06protos\"\xb8\x01\n" +
 	"\tHeartbeat\x12\x0e\n" +
 	"\x02sn\x18\x01 \x01(\tR\x02sn\x12\x10\n" +
 	"\x03ver\x18\x02 \x01(\tR\x03ver\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\"\x95\x01\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x126\n" +
+	"\fprocess_info\x18\x04 \x03(\v2\x13.protos.ProcessInfoR\vprocessInfo\x123\n" +
+	"\vdocker_info\x18\x05 \x03(\v2\x12.protos.DockerInfoR\n" +
+	"dockerInfo\"\x95\x01\n" +
 	"\vDeviceAgent\x12\x0e\n" +
 	"\x02sn\x18\x01 \x01(\tR\x02sn\x12\x10\n" +
 	"\x03ver\x18\x02 \x01(\tR\x03ver\x12\x1f\n" +
@@ -491,7 +617,14 @@ const file_tcp_proto_rawDesc = "" +
 	"\x02sn\x18\x04 \x01(\tR\x02sn\x12\x1f\n" +
 	"\vaccess_name\x18\x05 \x01(\tR\n" +
 	"accessName\x12\x12\n" +
-	"\x04resp\x18\x06 \x01(\tR\x04resp*a\n" +
+	"\x04resp\x18\x06 \x01(\tR\x04resp\"E\n" +
+	"\vProcessInfo\x12\x10\n" +
+	"\x03pid\x18\x01 \x01(\x05R\x03pid\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
+	"\x03exe\x18\x03 \x01(\tR\x03exe\"\x1c\n" +
+	"\n" +
+	"DockerInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id*a\n" +
 	"\aMsgType\x12\x14\n" +
 	"\x10MSG_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
 	"\x12MSG_TYPE_HEARTBEAT\x10\x01\x12\x11\n" +
@@ -515,7 +648,7 @@ func file_tcp_proto_rawDescGZIP() []byte {
 }
 
 var file_tcp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_tcp_proto_goTypes = []any{
 	(MsgType)(0),        // 0: protos.MsgType
 	(TaskType)(0),       // 1: protos.TaskType
@@ -523,15 +656,19 @@ var file_tcp_proto_goTypes = []any{
 	(*DeviceAgent)(nil), // 3: protos.DeviceAgent
 	(*Task)(nil),        // 4: protos.Task
 	(*TaskResp)(nil),    // 5: protos.TaskResp
+	(*ProcessInfo)(nil), // 6: protos.ProcessInfo
+	(*DockerInfo)(nil),  // 7: protos.DockerInfo
 }
 var file_tcp_proto_depIdxs = []int32{
-	1, // 0: protos.Task.task_type:type_name -> protos.TaskType
-	1, // 1: protos.TaskResp.task_type:type_name -> protos.TaskType
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 0: protos.Heartbeat.process_info:type_name -> protos.ProcessInfo
+	7, // 1: protos.Heartbeat.docker_info:type_name -> protos.DockerInfo
+	1, // 2: protos.Task.task_type:type_name -> protos.TaskType
+	1, // 3: protos.TaskResp.task_type:type_name -> protos.TaskType
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_tcp_proto_init() }
@@ -545,7 +682,7 @@ func file_tcp_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tcp_proto_rawDesc), len(file_tcp_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

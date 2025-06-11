@@ -16,7 +16,7 @@ import (
 	redis "github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -42,7 +42,7 @@ type ConfigStruct struct {
 	Host           string `yaml:"host"`
 	HttpServerAddr string `yaml:"http_server_addr"`
 	TcpServerAddr  string `yaml:"tcp_server_addr"`
-	MysqlURN       string `yaml:"mysql_urn"`
+	PGURN          string `yaml:"pg_urn"`
 	RedisAddr      string `yaml:"redis_addr"`
 	UploadDir      string `yaml:"upload_dir"`
 	FileDir        string `yaml:"file_dir"`
@@ -69,9 +69,9 @@ func init() {
 		panic(e)
 	}
 
-	if len(ServConfig.MysqlURN) > 0 {
-		if e := InitGorm(ServConfig.MysqlURN); e != nil {
-			fmt.Println("InitGorm: ", ServConfig.MysqlURN, e)
+	if len(ServConfig.PGURN) > 0 {
+		if e := InitGorm(ServConfig.PGURN); e != nil {
+			fmt.Println("InitGorm: ", ServConfig.PGURN, e)
 			panic(e)
 		}
 	}
@@ -111,11 +111,14 @@ func InitLog(logDir, logLevel string) error {
 }
 
 func InitGorm(dsn string) (e error) {
-	if OrmCli, e = gorm.Open(mysql.Open(dsn),
-		&gorm.Config{
-			SkipDefaultTransaction: true,
-			Logger:                 logger.Default.LogMode(logger.Warn),
-		}); e != nil {
+
+	if OrmCli, e = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,  // "host=localhost user=pcdn password=pcdn12321 dbname=pcdn port=5432 sslmode=disable TimeZone=Asia/Shanghai",
+		PreferSimpleProtocol: true, // disables implicit prepared statement usage
+	}), &gorm.Config{
+		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Warn),
+	}); e != nil {
 		return
 	}
 

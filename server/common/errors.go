@@ -13,4 +13,5 @@ var (
 
 	ErrAgentNoAccess = errors.NewError(-10000, "AGENT接入点错误")
 	ErrAgentNoId     = errors.NewError(-10001, "任务没有ID")
+	ErrAgentSNExists = errors.NewError(-10002, "设备SN已存在")
 )

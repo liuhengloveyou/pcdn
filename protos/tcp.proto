@@ -22,7 +22,12 @@ enum TaskType {
 message Heartbeat {
   string sn = 1;
   string ver = 2;
-  int64 timestamp = 3;  // 添加时间戳字段，使用int64类型表示Unix时间戳
+  int64 timestamp = 3;  // 使用int64类型表示Unix时间戳
+
+  // 进程信息
+  repeated ProcessInfo process_info = 4;
+  // docker信息
+  repeated DockerInfo docker_info = 5;
 }
 
 message DeviceAgent {
@@ -60,4 +65,16 @@ message TaskResp {
   string sn = 4; // 设备SN
   string access_name  = 5; // 接入服务名
   string resp = 6;
+}
+
+
+// 设备进程信息
+message ProcessInfo {
+  int32 pid = 1;
+  string name = 2;
+  string exe = 3;
+}
+
+message DockerInfo {
+  string id = 1;
 }
