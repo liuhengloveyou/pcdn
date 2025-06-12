@@ -25,6 +25,12 @@ const (
 	MAX_UPLOAD_LEN = 5242880
 )
 
+// redis key
+const (
+	AGENT_KEY_PREFIX         = "agent/"
+	AGENT_MONITOR_KEY_PREFIX = "agent/monitor/"
+)
+
 var confile = flag.String("c", "app.conf.yaml", "配置文件")
 var (
 	ProxyURL = "" // "http://127.0.0.1:10808" // 是否是开发环境

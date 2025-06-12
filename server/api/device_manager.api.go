@@ -23,12 +23,14 @@ func initDeviceManagerApi() {
 		NeedLogin: true,
 	}
 
+	// 查询设备列表
 	Apis["/device/list"] = ApiStruct{
 		Handler:   ListDevices,
 		Method:    "GET",
 		NeedLogin: true,
 	}
 
+	// 更新设备信息
 	Apis["/device/update"] = ApiStruct{
 		Handler:   UpdateAgent,
 		Method:    "POST",
@@ -45,6 +47,13 @@ func initDeviceManagerApi() {
 	// 重置密码
 	Apis["/device/resetpwd"] = ApiStruct{
 		Handler:   ResetDevicePWD,
+		Method:    "GET",
+		NeedLogin: true,
+	}
+
+	// 查询设备监控信息
+	Apis["/device/monitor"] = ApiStruct{
+		Handler:   GetDeviceMonitorInfo,
 		Method:    "GET",
 		NeedLogin: true,
 	}
@@ -211,4 +220,29 @@ func ResetDevicePWD(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gocommon.HttpErr(w, http.StatusOK, 0, task.GetTaskId())
+}
+
+// 获取设备监控信息
+func GetDeviceMonitorInfo(w http.ResponseWriter, r *http.Request) {
+	sessionUser := ReadSessionFromRequest(r)
+	if sessionUser == nil || sessionUser.UID <= 0 {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrNoAuth)
+		return
+	}
+
+	r.ParseForm()
+	sn := r.FormValue("sn")
+	if sn == "" {
+		gocommon.HttpJsonErr(w, http.StatusOK, common.ErrParam)
+		return
+	}
+
+	// 调用服务层方法获取设备监控信息
+	monitorInfo, err := service.DeviceService.GetMonitorInfo(sn)
+	if err != nil {
+		gocommon.HttpJsonErr(w, http.StatusOK, err)
+		return
+	}
+
+	gocommon.HttpErr(w, http.StatusOK, 0, monitorInfo)
 }

@@ -20,10 +20,12 @@ import (
 
 // var conn net.Conn
 
+var taskCh = make(chan *protos.Task, 100)
+
 func InitTcpClient(addr string) (err error) {
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
-		common.Logger.Error("连接服务端失败", zap.Error(err))
+		common.Logger.Error("net.Dial ", zap.Error(err))
 		return
 	}
 	defer conn.Close()
@@ -86,10 +88,16 @@ func processWrite(conn net.Conn) {
 	defer ticker.Stop()
 
 	for {
-		if err := sendHeartbeat(conn); err != nil {
-			return
+		select {
+		case task := <-taskCh:
+			if err := processTaskReal(conn, task); err != nil {
+				common.Logger.Error("processTaskReal ERR: ", zap.Error(err))
+			}
+		case <-ticker.C:
+			if err := sendHeartbeat(conn); err != nil {
+				return
+			}
 		}
-		<-ticker.C
 	}
 }
 
@@ -99,8 +107,6 @@ func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
 		return processHeartbeatMsg(conn, msgByte)
 	case uint32(protos.MsgType_MSG_TYPE_TASK):
 		return processTaskMsg(conn, msgByte)
-	// case uint32(protos.MsgType_MSG_TYPE_TASK_RESP):
-	// 	processGetTaskRespMsg(conn, msgByte)
 	default:
 		common.Logger.Sugar().Debugf("processOneMsg type ERR: %v\n", msgType, string(msgByte))
 	}
@@ -114,9 +120,10 @@ func processOneMsg(conn net.Conn, msgType uint32, msgByte []byte) error {
 func sendHeartbeat(conn net.Conn) error {
 	// 创建心跳包
 	heartbeat := &protos.Heartbeat{
-		Sn:        "sn-1",
+		Sn:        "sn00001",
 		Ver:       Version,
 		Timestamp: time.Now().UnixMilli(),
+		Monitor:   &protos.SystemMonitorData{},
 	}
 
 	if DeviceSN != nil && *DeviceSN != "" {
@@ -125,6 +132,9 @@ func sendHeartbeat(conn net.Conn) error {
 
 	// PS进程信息
 	logics.FillProcessInfo(heartbeat)
+
+	// 网络流量信息
+	logics.FillNetworkInfo(heartbeat)
 
 	// 序列化为二进制数据
 	data, err := proto.Marshal(heartbeat)
@@ -232,6 +242,14 @@ func processTaskMsg(conn net.Conn, msgByte []byte) error {
 	}
 	common.Logger.Debug("processTaskMsg: ", zap.Any("task", task.String()))
 
+	taskCh <- &task
+
+	return nil
+}
+
+func processTaskReal(conn net.Conn, task *protos.Task) error {
+	common.Logger.Debug("processTaskReal: ", zap.Any("task", task.String()))
+
 	var err error
 	if task.TaskType == protos.TaskType_TASK_TYPE_RESETPWD {
 		// 重置密码
@@ -242,9 +260,9 @@ func processTaskMsg(conn net.Conn, msgByte []byte) error {
 	}
 
 	if err != nil {
-		sendTaskResp(conn, &task, err.Error())
+		sendTaskResp(conn, task, err.Error())
 	} else {
-		sendTaskResp(conn, &task, "OK")
+		sendTaskResp(conn, task, "OK")
 	}
 
 	return nil

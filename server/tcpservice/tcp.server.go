@@ -106,7 +106,13 @@ func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
 		common.Logger.Sugar().Errorf("heartbeat err: ", string(msgByte), err)
 		return err
 	}
-	common.Logger.Debug("heartbeat: ", zap.Any("heartbeat", heartbeat))
+	common.Logger.Debug("heartbeat: ",
+		zap.Any("heartbeat", heartbeat.Sn),
+		zap.Any("ver", heartbeat.Ver),
+		zap.Any("timestamp", heartbeat.Timestamp),
+		zap.Any("netowrk", len(heartbeat.Monitor.Network)),
+		zap.Any("process", len(heartbeat.Monitor.Processes)),
+	)
 
 	heartbeat.Sn = strings.ToUpper(heartbeat.Sn)
 	remoteAddr := strings.Split(conn.RemoteAddr().String(), ":")[0]
@@ -131,11 +137,9 @@ func processHeartbeatMsg(conn net.Conn, msgByte []byte) error {
 	if err := updateAgentStatusToRedis(tmpDevice); err != nil {
 		common.Logger.Error("updateAgentStatusToRedis ERR: ", zap.Error(err))
 	}
-	// 更新Redis中的Agent监控信息
-	if len(heartbeat.ProcessInfo) > 0 {
-		if err := updateAgentProcessToRedis(heartbeat.Sn, heartbeat.ProcessInfo); err != nil {
-			common.Logger.Error("updateAgentProcessToRedis ERR: ", zap.Error(err))
-		}
+	// 更新Redis中的Agent进程监控信息
+	if err := updateAgentMonitorToRedis(&heartbeat); err != nil {
+		common.Logger.Error("updateAgentMonitorToRedis ERR: ", zap.Error(err))
 	}
 
 	sendHeartbeat(conn, &protos.Heartbeat{

@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"pcdnagent/logics"
+	"pcdnagent/common"
 	"syscall"
 	"time"
 
 	gocommon "github.com/liuhengloveyou/go-common"
 	"github.com/liuhengloveyou/go-selfupdate/selfupdate"
+	"go.uber.org/zap"
 )
 
 var (
@@ -72,8 +73,6 @@ func main() {
 	flag.Parse()
 	sigHandler()
 
-	logics.PS()
-
 	if *showVer {
 		fmt.Printf("%s\t%s\n", Version, BuildTime)
 		return
@@ -99,7 +98,7 @@ func main() {
 	go func() {
 		for {
 			if err := InitTcpClient(*tcpServer); err != nil {
-				fmt.Println(err)
+				common.Logger.Error("InitTcpClient err: ", zap.Error(err))
 			}
 
 			time.Sleep(5 * time.Second)

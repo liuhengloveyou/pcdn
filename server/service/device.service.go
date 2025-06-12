@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	passportprotos "github.com/liuhengloveyou/passport/protos"
+	"github.com/liuhengloveyou/pcdn/protos"
 	"go.uber.org/zap"
 )
 
@@ -143,4 +144,30 @@ func (s *deviceService) Delete(sessionUser *passportprotos.User, id uint64) erro
 	log.TenantId = sessionUser.TenantID
 	BusinessLogService.Add(log)
 	return nil
+}
+
+// 获取设备监控信息
+func (s *deviceService) GetMonitorInfo(sn string) (*protos.SystemMonitorData, error) {
+	if sn == "" {
+		return nil, common.ErrParam
+	}
+
+	// TODO 当前用户有没有权限查看？
+
+	// 从Redis获取监控信息
+	key := fmt.Sprintf("%s%s", common.AGENT_MONITOR_KEY_PREFIX, strings.ToUpper(sn))
+	monitorData, err := common.RedisClient.Get(context.Background(), key).Result()
+	if err != nil {
+		logger.Error("deviceService.GetMonitorInfo redis ERR: ", zap.String("key", key), zap.Error(err))
+		return nil, common.ErrService
+	}
+
+	// 解析监控信息
+	var monitorJson protos.SystemMonitorData
+	if err := json.Unmarshal([]byte(monitorData), &monitorJson); err != nil {
+		logger.Error("deviceService.GetMonitorInfo Unmarshal ERR: ", zap.Error(err))
+		return nil, common.ErrService
+	}
+
+	return &monitorJson, nil
 }

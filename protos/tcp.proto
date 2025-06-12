@@ -25,9 +25,7 @@ message Heartbeat {
   int64 timestamp = 3;  // 使用int64类型表示Unix时间戳
 
   // 进程信息
-  repeated ProcessInfo process_info = 4;
-  // docker信息
-  repeated DockerInfo docker_info = 5;
+  SystemMonitorData monitor = 4;
 }
 
 message DeviceAgent {
@@ -67,14 +65,58 @@ message TaskResp {
   string resp = 6;
 }
 
-
-// 设备进程信息
-message ProcessInfo {
+// 系统监控进程信息
+message SystemMonitorProcess {
   int32 pid = 1;
   string name = 2;
   string exe = 3;
+  float cpu = 4;
+  float memory = 5;
+  string status = 6;
 }
 
-message DockerInfo {
-  string id = 1;
+// 系统监控CPU信息
+message SystemMonitorCpu {
+  float usage = 1;
+  int32 cores = 2;
+  float temperature = 3;
+}
+
+// 系统监控内存信息
+message SystemMonitorMemory {
+  int64 used = 1;
+  int64 total = 2;
+  int64 available = 3;
+}
+
+// 系统监控磁盘信息
+message SystemMonitorDisk {
+  int64 used = 1;
+  int64 total = 2;
+  int64 free = 3;
+}
+
+// 系统监控网络信息
+message SystemMonitorNetwork {
+  string name = 1;        // 网络接口名称
+  uint64 bytes_sent = 2;   // 发送的字节数
+  uint64 bytes_recv = 3;   // 接收的字节数
+  uint64 packets_sent = 4; // 发送的数据包数
+  uint64 packets_recv = 5; // 接收的数据包数
+  uint64 errin = 6;        // 接收错误数
+  uint64 errout = 7;       // 发送错误数
+  uint64 dropin = 8;       // 接收丢包数
+  uint64 dropout = 9;      // 发送丢包数
+  int64 timestamp = 10;    // 采样时间
+  double send_rate = 11;    // 发送速率 (bytes/s)
+  double recv_rate = 12;    // 接收速率 (bytes/s)
+}
+
+// 获取设备系统监控数据
+message SystemMonitorData {
+  SystemMonitorCpu cpu = 1;
+  SystemMonitorMemory memory = 2;
+  SystemMonitorDisk disk = 3;
+  repeated SystemMonitorNetwork network = 4;
+  repeated SystemMonitorProcess processes = 5;
 }

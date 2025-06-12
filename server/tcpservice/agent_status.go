@@ -11,8 +11,6 @@ import (
 	"pcdn-server/models"
 )
 
-const AGENT_KEY_PREFIX = "agent/"
-
 func getAgentStatusFromRedis(sn string) (agent *models.DeviceModel, err error) {
 	ctx := context.Background()
 	rstStr, err := common.RedisClient.Get(ctx, snToKey(sn)).Bytes()
@@ -59,5 +57,5 @@ func updateAgentStatusToRedis(agent *models.DeviceModel) error {
 }
 
 func snToKey(sn string) string {
-	return fmt.Sprintf("%s%s", AGENT_KEY_PREFIX, strings.ToUpper(sn))
+	return fmt.Sprintf("%s%s", common.AGENT_KEY_PREFIX, strings.ToUpper(sn))
 }

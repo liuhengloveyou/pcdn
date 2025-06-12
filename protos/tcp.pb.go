@@ -130,9 +130,7 @@ type Heartbeat struct {
 	Ver       string                 `protobuf:"bytes,2,opt,name=ver,proto3" json:"ver,omitempty"`
 	Timestamp int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 使用int64类型表示Unix时间戳
 	// 进程信息
-	ProcessInfo []*ProcessInfo `protobuf:"bytes,4,rep,name=process_info,json=processInfo,proto3" json:"process_info,omitempty"`
-	// docker信息
-	DockerInfo    []*DockerInfo `protobuf:"bytes,5,rep,name=docker_info,json=dockerInfo,proto3" json:"docker_info,omitempty"`
+	Monitor       *SystemMonitorData `protobuf:"bytes,4,opt,name=monitor,proto3" json:"monitor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -188,16 +186,9 @@ func (x *Heartbeat) GetTimestamp() int64 {
 	return 0
 }
 
-func (x *Heartbeat) GetProcessInfo() []*ProcessInfo {
+func (x *Heartbeat) GetMonitor() *SystemMonitorData {
 	if x != nil {
-		return x.ProcessInfo
-	}
-	return nil
-}
-
-func (x *Heartbeat) GetDockerInfo() []*DockerInfo {
-	if x != nil {
-		return x.DockerInfo
+		return x.Monitor
 	}
 	return nil
 }
@@ -474,30 +465,33 @@ func (x *TaskResp) GetResp() string {
 	return ""
 }
 
-// 设备进程信息
-type ProcessInfo struct {
+// 系统监控进程信息
+type SystemMonitorProcess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pid           int32                  `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Exe           string                 `protobuf:"bytes,3,opt,name=exe,proto3" json:"exe,omitempty"`
+	Cpu           float32                `protobuf:"fixed32,4,opt,name=cpu,proto3" json:"cpu,omitempty"`
+	Memory        float32                `protobuf:"fixed32,5,opt,name=memory,proto3" json:"memory,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ProcessInfo) Reset() {
-	*x = ProcessInfo{}
+func (x *SystemMonitorProcess) Reset() {
+	*x = SystemMonitorProcess{}
 	mi := &file_tcp_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ProcessInfo) String() string {
+func (x *SystemMonitorProcess) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ProcessInfo) ProtoMessage() {}
+func (*SystemMonitorProcess) ProtoMessage() {}
 
-func (x *ProcessInfo) ProtoReflect() protoreflect.Message {
+func (x *SystemMonitorProcess) ProtoReflect() protoreflect.Message {
 	mi := &file_tcp_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -509,53 +503,77 @@ func (x *ProcessInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ProcessInfo.ProtoReflect.Descriptor instead.
-func (*ProcessInfo) Descriptor() ([]byte, []int) {
+// Deprecated: Use SystemMonitorProcess.ProtoReflect.Descriptor instead.
+func (*SystemMonitorProcess) Descriptor() ([]byte, []int) {
 	return file_tcp_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ProcessInfo) GetPid() int32 {
+func (x *SystemMonitorProcess) GetPid() int32 {
 	if x != nil {
 		return x.Pid
 	}
 	return 0
 }
 
-func (x *ProcessInfo) GetName() string {
+func (x *SystemMonitorProcess) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *ProcessInfo) GetExe() string {
+func (x *SystemMonitorProcess) GetExe() string {
 	if x != nil {
 		return x.Exe
 	}
 	return ""
 }
 
-type DockerInfo struct {
+func (x *SystemMonitorProcess) GetCpu() float32 {
+	if x != nil {
+		return x.Cpu
+	}
+	return 0
+}
+
+func (x *SystemMonitorProcess) GetMemory() float32 {
+	if x != nil {
+		return x.Memory
+	}
+	return 0
+}
+
+func (x *SystemMonitorProcess) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+// 系统监控CPU信息
+type SystemMonitorCpu struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Usage         float32                `protobuf:"fixed32,1,opt,name=usage,proto3" json:"usage,omitempty"`
+	Cores         int32                  `protobuf:"varint,2,opt,name=cores,proto3" json:"cores,omitempty"`
+	Temperature   float32                `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DockerInfo) Reset() {
-	*x = DockerInfo{}
+func (x *SystemMonitorCpu) Reset() {
+	*x = SystemMonitorCpu{}
 	mi := &file_tcp_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DockerInfo) String() string {
+func (x *SystemMonitorCpu) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DockerInfo) ProtoMessage() {}
+func (*SystemMonitorCpu) ProtoMessage() {}
 
-func (x *DockerInfo) ProtoReflect() protoreflect.Message {
+func (x *SystemMonitorCpu) ProtoReflect() protoreflect.Message {
 	mi := &file_tcp_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -567,30 +585,374 @@ func (x *DockerInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DockerInfo.ProtoReflect.Descriptor instead.
-func (*DockerInfo) Descriptor() ([]byte, []int) {
+// Deprecated: Use SystemMonitorCpu.ProtoReflect.Descriptor instead.
+func (*SystemMonitorCpu) Descriptor() ([]byte, []int) {
 	return file_tcp_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *DockerInfo) GetId() string {
+func (x *SystemMonitorCpu) GetUsage() float32 {
 	if x != nil {
-		return x.Id
+		return x.Usage
+	}
+	return 0
+}
+
+func (x *SystemMonitorCpu) GetCores() int32 {
+	if x != nil {
+		return x.Cores
+	}
+	return 0
+}
+
+func (x *SystemMonitorCpu) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+// 系统监控内存信息
+type SystemMonitorMemory struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Used          int64                  `protobuf:"varint,1,opt,name=used,proto3" json:"used,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Available     int64                  `protobuf:"varint,3,opt,name=available,proto3" json:"available,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SystemMonitorMemory) Reset() {
+	*x = SystemMonitorMemory{}
+	mi := &file_tcp_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SystemMonitorMemory) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemMonitorMemory) ProtoMessage() {}
+
+func (x *SystemMonitorMemory) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemMonitorMemory.ProtoReflect.Descriptor instead.
+func (*SystemMonitorMemory) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SystemMonitorMemory) GetUsed() int64 {
+	if x != nil {
+		return x.Used
+	}
+	return 0
+}
+
+func (x *SystemMonitorMemory) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *SystemMonitorMemory) GetAvailable() int64 {
+	if x != nil {
+		return x.Available
+	}
+	return 0
+}
+
+// 系统监控磁盘信息
+type SystemMonitorDisk struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Used          int64                  `protobuf:"varint,1,opt,name=used,proto3" json:"used,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Free          int64                  `protobuf:"varint,3,opt,name=free,proto3" json:"free,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SystemMonitorDisk) Reset() {
+	*x = SystemMonitorDisk{}
+	mi := &file_tcp_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SystemMonitorDisk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemMonitorDisk) ProtoMessage() {}
+
+func (x *SystemMonitorDisk) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemMonitorDisk.ProtoReflect.Descriptor instead.
+func (*SystemMonitorDisk) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SystemMonitorDisk) GetUsed() int64 {
+	if x != nil {
+		return x.Used
+	}
+	return 0
+}
+
+func (x *SystemMonitorDisk) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *SystemMonitorDisk) GetFree() int64 {
+	if x != nil {
+		return x.Free
+	}
+	return 0
+}
+
+// 系统监控网络信息
+type SystemMonitorNetwork struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                   // 网络接口名称
+	BytesSent     uint64                 `protobuf:"varint,2,opt,name=bytes_sent,json=bytesSent,proto3" json:"bytes_sent,omitempty"`       // 发送的字节数
+	BytesRecv     uint64                 `protobuf:"varint,3,opt,name=bytes_recv,json=bytesRecv,proto3" json:"bytes_recv,omitempty"`       // 接收的字节数
+	PacketsSent   uint64                 `protobuf:"varint,4,opt,name=packets_sent,json=packetsSent,proto3" json:"packets_sent,omitempty"` // 发送的数据包数
+	PacketsRecv   uint64                 `protobuf:"varint,5,opt,name=packets_recv,json=packetsRecv,proto3" json:"packets_recv,omitempty"` // 接收的数据包数
+	Errin         uint64                 `protobuf:"varint,6,opt,name=errin,proto3" json:"errin,omitempty"`                                // 接收错误数
+	Errout        uint64                 `protobuf:"varint,7,opt,name=errout,proto3" json:"errout,omitempty"`                              // 发送错误数
+	Dropin        uint64                 `protobuf:"varint,8,opt,name=dropin,proto3" json:"dropin,omitempty"`                              // 接收丢包数
+	Dropout       uint64                 `protobuf:"varint,9,opt,name=dropout,proto3" json:"dropout,omitempty"`                            // 发送丢包数
+	Timestamp     int64                  `protobuf:"varint,10,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                       // 采样时间
+	SendRate      float64                `protobuf:"fixed64,11,opt,name=send_rate,json=sendRate,proto3" json:"send_rate,omitempty"`        // 发送速率 (bytes/s)
+	RecvRate      float64                `protobuf:"fixed64,12,opt,name=recv_rate,json=recvRate,proto3" json:"recv_rate,omitempty"`        // 接收速率 (bytes/s)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SystemMonitorNetwork) Reset() {
+	*x = SystemMonitorNetwork{}
+	mi := &file_tcp_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SystemMonitorNetwork) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemMonitorNetwork) ProtoMessage() {}
+
+func (x *SystemMonitorNetwork) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemMonitorNetwork.ProtoReflect.Descriptor instead.
+func (*SystemMonitorNetwork) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SystemMonitorNetwork) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
+}
+
+func (x *SystemMonitorNetwork) GetBytesSent() uint64 {
+	if x != nil {
+		return x.BytesSent
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetBytesRecv() uint64 {
+	if x != nil {
+		return x.BytesRecv
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetPacketsSent() uint64 {
+	if x != nil {
+		return x.PacketsSent
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetPacketsRecv() uint64 {
+	if x != nil {
+		return x.PacketsRecv
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetErrin() uint64 {
+	if x != nil {
+		return x.Errin
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetErrout() uint64 {
+	if x != nil {
+		return x.Errout
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetDropin() uint64 {
+	if x != nil {
+		return x.Dropin
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetDropout() uint64 {
+	if x != nil {
+		return x.Dropout
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetSendRate() float64 {
+	if x != nil {
+		return x.SendRate
+	}
+	return 0
+}
+
+func (x *SystemMonitorNetwork) GetRecvRate() float64 {
+	if x != nil {
+		return x.RecvRate
+	}
+	return 0
+}
+
+// 获取设备系统监控数据
+type SystemMonitorData struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Cpu           *SystemMonitorCpu       `protobuf:"bytes,1,opt,name=cpu,proto3" json:"cpu,omitempty"`
+	Memory        *SystemMonitorMemory    `protobuf:"bytes,2,opt,name=memory,proto3" json:"memory,omitempty"`
+	Disk          *SystemMonitorDisk      `protobuf:"bytes,3,opt,name=disk,proto3" json:"disk,omitempty"`
+	Network       []*SystemMonitorNetwork `protobuf:"bytes,4,rep,name=network,proto3" json:"network,omitempty"`
+	Processes     []*SystemMonitorProcess `protobuf:"bytes,5,rep,name=processes,proto3" json:"processes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SystemMonitorData) Reset() {
+	*x = SystemMonitorData{}
+	mi := &file_tcp_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SystemMonitorData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemMonitorData) ProtoMessage() {}
+
+func (x *SystemMonitorData) ProtoReflect() protoreflect.Message {
+	mi := &file_tcp_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemMonitorData.ProtoReflect.Descriptor instead.
+func (*SystemMonitorData) Descriptor() ([]byte, []int) {
+	return file_tcp_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SystemMonitorData) GetCpu() *SystemMonitorCpu {
+	if x != nil {
+		return x.Cpu
+	}
+	return nil
+}
+
+func (x *SystemMonitorData) GetMemory() *SystemMonitorMemory {
+	if x != nil {
+		return x.Memory
+	}
+	return nil
+}
+
+func (x *SystemMonitorData) GetDisk() *SystemMonitorDisk {
+	if x != nil {
+		return x.Disk
+	}
+	return nil
+}
+
+func (x *SystemMonitorData) GetNetwork() []*SystemMonitorNetwork {
+	if x != nil {
+		return x.Network
+	}
+	return nil
+}
+
+func (x *SystemMonitorData) GetProcesses() []*SystemMonitorProcess {
+	if x != nil {
+		return x.Processes
+	}
+	return nil
 }
 
 var File_tcp_proto protoreflect.FileDescriptor
 
 const file_tcp_proto_rawDesc = "" +
 	"\n" +
-	"\ttcp.proto\x12\x06protos\"\xb8\x01\n" +
+	"\ttcp.proto\x12\x06protos\"\x80\x01\n" +
 	"\tHeartbeat\x12\x0e\n" +
 	"\x02sn\x18\x01 \x01(\tR\x02sn\x12\x10\n" +
 	"\x03ver\x18\x02 \x01(\tR\x03ver\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x126\n" +
-	"\fprocess_info\x18\x04 \x03(\v2\x13.protos.ProcessInfoR\vprocessInfo\x123\n" +
-	"\vdocker_info\x18\x05 \x03(\v2\x12.protos.DockerInfoR\n" +
-	"dockerInfo\"\x95\x01\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x123\n" +
+	"\amonitor\x18\x04 \x01(\v2\x19.protos.SystemMonitorDataR\amonitor\"\x95\x01\n" +
 	"\vDeviceAgent\x12\x0e\n" +
 	"\x02sn\x18\x01 \x01(\tR\x02sn\x12\x10\n" +
 	"\x03ver\x18\x02 \x01(\tR\x03ver\x12\x1f\n" +
@@ -617,14 +979,48 @@ const file_tcp_proto_rawDesc = "" +
 	"\x02sn\x18\x04 \x01(\tR\x02sn\x12\x1f\n" +
 	"\vaccess_name\x18\x05 \x01(\tR\n" +
 	"accessName\x12\x12\n" +
-	"\x04resp\x18\x06 \x01(\tR\x04resp\"E\n" +
-	"\vProcessInfo\x12\x10\n" +
+	"\x04resp\x18\x06 \x01(\tR\x04resp\"\x90\x01\n" +
+	"\x14SystemMonitorProcess\x12\x10\n" +
 	"\x03pid\x18\x01 \x01(\x05R\x03pid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
-	"\x03exe\x18\x03 \x01(\tR\x03exe\"\x1c\n" +
+	"\x03exe\x18\x03 \x01(\tR\x03exe\x12\x10\n" +
+	"\x03cpu\x18\x04 \x01(\x02R\x03cpu\x12\x16\n" +
+	"\x06memory\x18\x05 \x01(\x02R\x06memory\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"`\n" +
+	"\x10SystemMonitorCpu\x12\x14\n" +
+	"\x05usage\x18\x01 \x01(\x02R\x05usage\x12\x14\n" +
+	"\x05cores\x18\x02 \x01(\x05R\x05cores\x12 \n" +
+	"\vtemperature\x18\x03 \x01(\x02R\vtemperature\"]\n" +
+	"\x13SystemMonitorMemory\x12\x12\n" +
+	"\x04used\x18\x01 \x01(\x03R\x04used\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total\x12\x1c\n" +
+	"\tavailable\x18\x03 \x01(\x03R\tavailable\"Q\n" +
+	"\x11SystemMonitorDisk\x12\x12\n" +
+	"\x04used\x18\x01 \x01(\x03R\x04used\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total\x12\x12\n" +
+	"\x04free\x18\x03 \x01(\x03R\x04free\"\xe6\x02\n" +
+	"\x14SystemMonitorNetwork\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +
-	"DockerInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id*a\n" +
+	"bytes_sent\x18\x02 \x01(\x04R\tbytesSent\x12\x1d\n" +
+	"\n" +
+	"bytes_recv\x18\x03 \x01(\x04R\tbytesRecv\x12!\n" +
+	"\fpackets_sent\x18\x04 \x01(\x04R\vpacketsSent\x12!\n" +
+	"\fpackets_recv\x18\x05 \x01(\x04R\vpacketsRecv\x12\x14\n" +
+	"\x05errin\x18\x06 \x01(\x04R\x05errin\x12\x16\n" +
+	"\x06errout\x18\a \x01(\x04R\x06errout\x12\x16\n" +
+	"\x06dropin\x18\b \x01(\x04R\x06dropin\x12\x18\n" +
+	"\adropout\x18\t \x01(\x04R\adropout\x12\x1c\n" +
+	"\ttimestamp\x18\n" +
+	" \x01(\x03R\ttimestamp\x12\x1b\n" +
+	"\tsend_rate\x18\v \x01(\x01R\bsendRate\x12\x1b\n" +
+	"\trecv_rate\x18\f \x01(\x01R\brecvRate\"\x97\x02\n" +
+	"\x11SystemMonitorData\x12*\n" +
+	"\x03cpu\x18\x01 \x01(\v2\x18.protos.SystemMonitorCpuR\x03cpu\x123\n" +
+	"\x06memory\x18\x02 \x01(\v2\x1b.protos.SystemMonitorMemoryR\x06memory\x12-\n" +
+	"\x04disk\x18\x03 \x01(\v2\x19.protos.SystemMonitorDiskR\x04disk\x126\n" +
+	"\anetwork\x18\x04 \x03(\v2\x1c.protos.SystemMonitorNetworkR\anetwork\x12:\n" +
+	"\tprocesses\x18\x05 \x03(\v2\x1c.protos.SystemMonitorProcessR\tprocesses*a\n" +
 	"\aMsgType\x12\x14\n" +
 	"\x10MSG_TYPE_UNKNOWN\x10\x00\x12\x16\n" +
 	"\x12MSG_TYPE_HEARTBEAT\x10\x01\x12\x11\n" +
@@ -648,27 +1044,35 @@ func file_tcp_proto_rawDescGZIP() []byte {
 }
 
 var file_tcp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_tcp_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_tcp_proto_goTypes = []any{
-	(MsgType)(0),        // 0: protos.MsgType
-	(TaskType)(0),       // 1: protos.TaskType
-	(*Heartbeat)(nil),   // 2: protos.Heartbeat
-	(*DeviceAgent)(nil), // 3: protos.DeviceAgent
-	(*Task)(nil),        // 4: protos.Task
-	(*TaskResp)(nil),    // 5: protos.TaskResp
-	(*ProcessInfo)(nil), // 6: protos.ProcessInfo
-	(*DockerInfo)(nil),  // 7: protos.DockerInfo
+	(MsgType)(0),                 // 0: protos.MsgType
+	(TaskType)(0),                // 1: protos.TaskType
+	(*Heartbeat)(nil),            // 2: protos.Heartbeat
+	(*DeviceAgent)(nil),          // 3: protos.DeviceAgent
+	(*Task)(nil),                 // 4: protos.Task
+	(*TaskResp)(nil),             // 5: protos.TaskResp
+	(*SystemMonitorProcess)(nil), // 6: protos.SystemMonitorProcess
+	(*SystemMonitorCpu)(nil),     // 7: protos.SystemMonitorCpu
+	(*SystemMonitorMemory)(nil),  // 8: protos.SystemMonitorMemory
+	(*SystemMonitorDisk)(nil),    // 9: protos.SystemMonitorDisk
+	(*SystemMonitorNetwork)(nil), // 10: protos.SystemMonitorNetwork
+	(*SystemMonitorData)(nil),    // 11: protos.SystemMonitorData
 }
 var file_tcp_proto_depIdxs = []int32{
-	6, // 0: protos.Heartbeat.process_info:type_name -> protos.ProcessInfo
-	7, // 1: protos.Heartbeat.docker_info:type_name -> protos.DockerInfo
-	1, // 2: protos.Task.task_type:type_name -> protos.TaskType
-	1, // 3: protos.TaskResp.task_type:type_name -> protos.TaskType
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	11, // 0: protos.Heartbeat.monitor:type_name -> protos.SystemMonitorData
+	1,  // 1: protos.Task.task_type:type_name -> protos.TaskType
+	1,  // 2: protos.TaskResp.task_type:type_name -> protos.TaskType
+	7,  // 3: protos.SystemMonitorData.cpu:type_name -> protos.SystemMonitorCpu
+	8,  // 4: protos.SystemMonitorData.memory:type_name -> protos.SystemMonitorMemory
+	9,  // 5: protos.SystemMonitorData.disk:type_name -> protos.SystemMonitorDisk
+	10, // 6: protos.SystemMonitorData.network:type_name -> protos.SystemMonitorNetwork
+	6,  // 7: protos.SystemMonitorData.processes:type_name -> protos.SystemMonitorProcess
+	8,  // [8:8] is the sub-list for method output_type
+	8,  // [8:8] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_tcp_proto_init() }
@@ -682,7 +1086,7 @@ func file_tcp_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tcp_proto_rawDesc), len(file_tcp_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   6,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
