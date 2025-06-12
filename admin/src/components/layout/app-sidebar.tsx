@@ -14,9 +14,6 @@ import { useAuthStore } from '@/stores/authStore'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthStore((state) => state.auth)
-
-  // eslint-disable-next-line no-console
-  console.log(user)
   
   return (
     <Sidebar collapsible='icon' {...props}>
