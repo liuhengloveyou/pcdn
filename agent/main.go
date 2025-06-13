@@ -38,7 +38,7 @@ var updater = &selfupdate.Updater{
 	BinURL:             *updateServer, // 托管二进制应用压缩包的服务器地址，作为补丁方法的备用
 	DiffURL:            *updateServer, // 托管二进制补丁差异的服务器地址，用于增量更新
 	Dir:                "updated/",    // 应用运行时创建的目录，用于存储 cktime 文件
-	CmdName:            "agent",       // 应用名称，会附加到 ApiURL 后用于查找更新
+	CmdName:            "pcdnagent",   // 应用名称，会附加到 ApiURL 后用于查找更新
 	ForceCheck:         true,          // 对于此示例，除非版本为 "dev"，否则始终检查更新
 	OnSuccessfulUpdate: onUpdated,
 }
