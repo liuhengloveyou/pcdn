@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# crontab 每分钟执行一次
+echo `date` > /tmp/pcdnagent.sh.log
+
+# crontab every on minuter
 # crontab -e 
 # * * * * * /opt/pcdnagent/pcdnagent.sh
 
-# 工作目录
 WORK_DIR="/opt/pcdnagent/"
-# 定义进程名称
 PROCESS_NAME="pcdnagent"
 
-# 进入工作目录
-cd "$WORK_DIR" || exit 1
 
-# 定义检查间隔时间（秒）
-CHECK_INTERVAL=30
+cd "$WORK_DIR" || exit 1
 
 # bash ./sn.sh &>/dev/null
 sn=`cat /proc/cmdline | grep -o 'snum=[^ ]*' |cut -d= -f2`

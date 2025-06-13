@@ -169,7 +169,7 @@ func sendHeartbeat(conn net.Conn) error {
 		return err
 	}
 
-	common.Logger.Debug("sendHeartbeat OK: ", zap.Any("heartbeat", heartbeat))
+	common.Logger.Debug("sendHeartbeat OK: ", zap.Any("ver", heartbeat.Ver), zap.Any("ts", heartbeat.Timestamp), zap.Any("msgLen", msgLen))
 
 	return nil
 }

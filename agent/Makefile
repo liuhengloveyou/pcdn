@@ -1,9 +1,9 @@
-VERSION=0.0.6
+VERSION=0.0.8
 BUILD_TIME=$(shell date "+%FZ%T")
 COMMIT_SHA1=$(shell git rev-parse HEAD)
 GIT_TAG=$(shell git describe --abbrev=0 --always)
 
-flags="-X main.Version=${VERSION} -X main.BuildTime=${BUILD_TIME} -X main.CommitID=${COMMIT_SHA1} -X main.GitTag=${GIT_TAG}"
+flags="-s -w -X main.Version=${VERSION} -X main.BuildTime=${BUILD_TIME} -X main.CommitID=${COMMIT_SHA1} -X main.GitTag=${GIT_TAG}"
 
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -28,3 +28,4 @@ linux:
 
 arm:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GOBUILD) --ldflags ${flags} -o $(BINARY_NAME) -v
+

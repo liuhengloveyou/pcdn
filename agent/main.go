@@ -9,11 +9,12 @@ import (
 	"os"
 	"os/signal"
 	"pcdnagent/common"
+	"pcdnagent/upgrade"
 	"syscall"
 	"time"
 
 	gocommon "github.com/liuhengloveyou/go-common"
-	"github.com/liuhengloveyou/go-selfupdate/selfupdate"
+	"github.com/sanbornm/go-selfupdate/selfupdate"
 	"go.uber.org/zap"
 )
 
@@ -24,11 +25,13 @@ var (
 
 	Sig string
 
-	showVer      = flag.Bool("version", false, "打印版本号")
-	initSys      = flag.Bool("init", false, "初始化系统")
-	tcpServer    = flag.String("tcp_server", "101.37.182.58:10001", "tcp服务地址")
-	updateServer = flag.String("update_server", "http://pcdn.intelliflyt.com/update", "更新服务器地址")
-	DeviceSN     = flag.String("sn", "", "设备SN")
+	showVer       = flag.Bool("version", false, "打印版本号")
+	initSys       = flag.Bool("init", false, "初始化系统")
+	genUpdate     = flag.Bool("gen-update", false, "生成升级信息JSON文件")
+	tcpServer     = flag.String("tcp_server", "101.37.182.58:10001", "tcp服务地址")
+	updateServer  = flag.String("update_server", "http://update.intelliflyt.com/update/", "更新服务器地址")
+	upgradeServer = flag.String("upgrade_server", "http://update.intelliflyt.com/upgrade/", "升级服务器地址")
+	DeviceSN      = flag.String("sn", "SN-1234567890", "设备SN")
 )
 
 // go-selfupdate setup and config
@@ -38,7 +41,7 @@ var updater = &selfupdate.Updater{
 	BinURL:             *updateServer, // 托管二进制应用压缩包的服务器地址，作为补丁方法的备用
 	DiffURL:            *updateServer, // 托管二进制补丁差异的服务器地址，用于增量更新
 	Dir:                "updated/",    // 应用运行时创建的目录，用于存储 cktime 文件
-	CmdName:            "agent",       // 应用名称，会附加到 ApiURL 后用于查找更新
+	CmdName:            "pcdnagent",   // 应用名称，会附加到 ApiURL 后用于查找更新
 	ForceCheck:         true,          // 对于此示例，除非版本为 "dev"，否则始终检查更新
 	OnSuccessfulUpdate: onUpdated,
 }
@@ -83,7 +86,23 @@ func main() {
 		return
 	}
 
+	// 生成升级JSON文件
+	if *genUpdate {
+		if err := generateUpdateInfo(); err != nil {
+			fmt.Printf("生成升级信息失败: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("升级信息JSON文件生成成功")
+		return
+	}
+
 	gocommon.SingleInstane("/tmp/pcdnagent.pid")
+
+	// 初始化升级服务
+	if err := checkAndUpgrade(); err != nil {
+		common.Logger.Error("Failed to initialize upgrade service", zap.Error(err))
+		// 不退出程序，升级功能失败不应该影响主要功能
+	}
 
 	// 启动的时候更新一次
 	if err := updater.BackgroundRun(); err != nil {
@@ -108,4 +127,32 @@ func main() {
 	InitTasks()
 
 	select {}
+}
+
+// initUpgradeService 初始化升级服务
+func checkAndUpgrade() error {
+	if *upgradeServer == "" {
+		common.Logger.Warn("Update server not configured, upgrade service disabled")
+		return nil
+	}
+
+	if *DeviceSN == "" {
+		common.Logger.Warn("Device SN not configured, upgrade service disabled")
+		return nil
+	}
+
+	// 创建简单升级器
+	upgrader := upgrade.NewSimpleUpgrader(*upgradeServer, Version, *DeviceSN)
+
+	// 启动时检查一次更新
+	if err := upgrader.CheckAndUpgrade(); err != nil {
+		common.Logger.Error("upgrader.CheckAndUpgrade ERR", zap.Error(err))
+	}
+
+	return nil
+}
+
+// generateUpdateInfo 生成升级信息JSON文件
+func generateUpdateInfo() error {
+	return upgrade.GenerateUpdateJSON(updateServer, Version, "./pcdnagent")
 }

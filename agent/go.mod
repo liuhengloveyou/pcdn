@@ -54,6 +54,7 @@ require (
 	github.com/kr/binarydist v0.1.0 // indirect
 	github.com/liuhengloveyou/passport v1.1.0
 	github.com/robfig/cron/v3 v3.0.0
+	github.com/sanbornm/go-selfupdate v0.0.0-20230714125711-e1c03e3d6ac7
 	github.com/shirou/gopsutil/v4 v4.25.5
 	go.uber.org/zap v1.27.0
 )

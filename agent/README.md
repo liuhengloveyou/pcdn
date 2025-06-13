@@ -1,5 +1,5 @@
 ```
-rsync -avx -e "ssh -p7637" root@192.168.1.7:/ rootfsnew
+rsync -avx -e --no-perms "ssh -p7637" root@192.168.1.7:/ rootfsnew
 ```
 
 以下是使用 Linux 自带的 `tc` 工具实现上行带宽限制到 **1Mbps** 的最简方法（无需编程，直接命令行操作）：
