@@ -1,0 +1,20 @@
+[Unit]
+Description=PCDN Agent Service (ARM Linux Version)
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=/opt/pcdnagent/sn.sh
+ExecStart=/opt/pcdnagent/pcdnagent
+WorkingDirectory=/opt/pcdnagent/
+Restart=always
+RestartSec=5
+User=root
+Group=root
+KillMode=process
+TimeoutStopSec=30
+StandardOutput=file:/var/log/pcdnagent.log
+StandardError=file:/var/log/pcdnagent.log
+
+[Install]
+WantedBy=multi-user.target

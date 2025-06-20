@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/liuhengloveyou/pcdn/protos";
+
+// 消息类型枚举
+enum MsgType {
+  MSG_TYPE_UNKNOWN = 0;     // 未知类型
+  MSG_TYPE_HEARTBEAT = 1;   // 心跳消息
+  MSG_TYPE_TASK = 2;        // 任务
+  MSG_TYPE_TASKRESP = 3;    // 任务应答
+  MSG_TYPE_HTTP_PROXY_REQ = 4;  // HTTP代理请求
+  MSG_TYPE_HTTP_PROXY_RESP = 5; // HTTP代理响应
+}
+
+// 消息类型枚举
+enum TaskType {
+  TASK_TYPE_UNKNOWN = 0;     // 未知类型
+  TASK_TYPE_RESETPWD = 1;   // 重置密码
+  TASK_TYPE_TC = 2;         // 网卡限速
+  TASK_TYPE_TC_CLEAN = 3;   // 网卡限速清理
+  TASK_TYPE_TC_STATUS = 4;  // 网卡限速状态
+  TASK_TYPE_ROUTER_ADMIN = 5; // 路由器管理
+}
+
+message Heartbeat {
+  string sn = 1;
+  string ver = 2;
+  int64 timestamp = 3;  // 使用int64类型表示Unix时间戳
+
+  // 进程信息
+  SystemMonitorData monitor = 4;
+}
+
+message DeviceAgent {
+  string sn = 1;
+  string ver = 2;
+  string remote_addr = 3;
+  int64 timestamp = 4; // 最后心跳带上来的时间
+  int64 last_heartbear = 5; // 最后心跳时间
+}
+
+
+// 任务结构体
+message Task {
+  string task_id = 1;
+  TaskType task_type = 2;
+  int64 timestamp = 3;
+  string sn = 4; // 设备SN
+  string access_name  = 5; // 接入服务名
+
+  // 重置密码字段
+  optional string username = 6;
+  optional string pwd = 7;
+
+  // 网卡限速
+  optional string iface_name = 8;
+  optional string rate = 9;
+  optional string target_ip = 10;
+
+  // 任务执行结果
+  string err_msg = 11;
+  
+  // 路由器管理URL
+  optional string url = 12;
+}
+
+// 系统监控进程信息
+message SystemMonitorProcess {
+  int32 pid = 1;
+  string name = 2;
+  string exe = 3;
+  float cpu = 4;
+  float memory = 5;
+  string status = 6;
+}
+
+// 系统监控CPU信息
+message SystemMonitorCpu {
+  float usage = 1;
+  int32 cores = 2;
+  float temperature = 3;
+}
+
+// 系统监控内存信息
+message SystemMonitorMemory {
+  int64 used = 1;
+  int64 total = 2;
+  int64 available = 3;
+}
+
+// 系统监控磁盘信息
+message SystemMonitorDisk {
+  int64 used = 1;
+  int64 total = 2;
+  int64 free = 3;
+}
+
+// 系统监控网络信息
+message SystemMonitorNetwork {
+  string name = 1;        // 网络接口名称
+  uint64 bytes_sent = 2;   // 发送的字节数
+  uint64 bytes_recv = 3;   // 接收的字节数
+  uint64 packets_sent = 4; // 发送的数据包数
+  uint64 packets_recv = 5; // 接收的数据包数
+  uint64 errin = 6;        // 接收错误数
+  uint64 errout = 7;       // 发送错误数
+  uint64 dropin = 8;       // 接收丢包数
+  uint64 dropout = 9;      // 发送丢包数
+  int64 timestamp = 10;    // 采样时间
+  double send_rate = 11;    // 发送速率 (bytes/s)
+  double recv_rate = 12;    // 接收速率 (bytes/s)
+}
+
+// 获取设备系统监控数据
+message SystemMonitorData {
+  SystemMonitorCpu cpu = 1;
+  SystemMonitorMemory memory = 2;
+  SystemMonitorDisk disk = 3;
+  repeated SystemMonitorNetwork network = 4;
+  repeated SystemMonitorProcess processes = 5;
+}
+
+// HTTP代理请求
+message HttpProxyRequest {
+  string session_id = 1;     // 会话ID，用于标识一个HTTP代理会话
+  string device_sn = 2;      // 设备序列号
+  string method = 3;         // HTTP方法：GET, POST等
+  string url = 4;            // 目标URL
+  map<string, string> headers = 5;  // HTTP请求头
+  bytes body = 6;            // 请求体
+  string proxy_id = 7;       // 代理ID，用于标识代理目标（如router-admin）
+}
+
+// HTTP代理响应
+message HttpProxyResponse {
+  string session_id = 1;     // 会话ID，与请求对应
+  int32 status_code = 2;     // HTTP状态码
+  map<string, string> headers = 3;  // HTTP响应头
+  bytes body = 4;            // 响应体
+  string error = 5;          // 错误信息，如果有
+}

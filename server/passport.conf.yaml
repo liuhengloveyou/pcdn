@@ -1,0 +1,9 @@
+log_dir: "./logs"
+log_level: "debug"
+mysql: "root:lhisroot@tcp(127.0.0.1:3306)/pcdn?charset=utf8mb4&parseTime=True&loc=Local"
+pg_urn: "host=localhost user=pcdn password=pcdn12321 dbname=pcdn port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+domain: ""
+session_key: "pcdn-sess"
+session_store_type: "cookie"
+session_expire: 259200

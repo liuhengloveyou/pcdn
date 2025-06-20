@@ -1,0 +1,107 @@
+package ws
+
+import (
+	"bytes"
+	"context"
+	"crypto/md5"
+	"fmt"
+	"net/http"
+	"time"
+	"pcdn-server/common"
+	"pcdn-server/protos"
+	"pcdn-server/service"
+
+	"go.uber.org/zap"
+	"nhooyr.io/websocket"
+	"nhooyr.io/websocket/wsjson"
+)
+
+func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := websocket.Accept(w, r, nil)
+	if err != nil {
+		common.Logger.Error("websocket.Accept ERR: ", zap.Error(err))
+		return
+	}
+
+	go websocketConnhandler(conn)
+}
+
+func websocketConnhandler(conn *websocket.Conn) {
+	// 10秒间隔心跳
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*30)
+	defer func() {
+		conn.Close(websocket.StatusNormalClosure, "")
+		conn.CloseNow()
+	}()
+
+	// 读第一包心跳
+	var firstReq protos.HeartbeatReq
+	err := wsjson.Read(ctx, conn, &firstReq)
+	if err != nil {
+		fmt.Println("wsjson.Read first ERR: ", err)
+		return
+	}
+	if firstReq.Method != protos.HEARTBEAT {
+		fmt.Println("wsjson.Read first ERR: ", err)
+		return
+	}
+
+	uuidk := md5.Sum([]byte(firstReq.UUID + common.Slot + firstReq.Time))
+	if !bytes.Equal(uuidk[:], firstReq.UUIDK[:]) {
+		fmt.Println("wsjson.Read md5 ERR: ", firstReq)
+		return
+	}
+
+	if _, err = service.MachineService.Register(firstReq.UUID); err != nil {
+		common.Logger.Error("Register ERR: ", zap.Error(err))
+	}
+
+	m, err := service.MachineService.Select(firstReq.UUID)
+	if err != nil || m == nil {
+		common.Logger.Error("Select ERR: ", zap.Error(err))
+		return
+	}
+
+	sappers[m.Id] = newSapper(m.Id, firstReq.UUID, conn)
+	// read
+	for {
+		var req protos.HeartbeatReq
+		ctx, _ = context.WithTimeout(context.Background(), time.Second*30)
+		err := wsjson.Read(ctx, conn, &req)
+		if err != nil {
+			common.Logger.Error("wsjson.Read ERR: ", zap.Error(err))
+			break
+		}
+		if req.Id <= 0 || len(req.UUID) == 0 {
+			common.Logger.Error("wsjson.Read ERR: ", zap.Error(err))
+			continue
+		}
+
+		switch req.Method {
+		case protos.BROWSERREPORT:
+			service.BrowserReportService.Add(req.Id, req.Data)
+		}
+	}
+
+	MachineOffline(m.Id)
+}
+
+func SendCommand(mid int64, command protos.MethodValue) error {
+	m, ok := sappers[mid]
+	if !ok {
+		return common.ErrMachineOffline
+	}
+
+	m.SendCommand(command)
+
+	return nil
+}
+
+func MachineOffline(mid int64) {
+	m, ok := sappers[mid]
+	if !ok {
+		return
+	}
+
+	m.Offline()
+}

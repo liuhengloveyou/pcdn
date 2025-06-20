@@ -1,0 +1,91 @@
+package ws
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"pcdn-server/common"
+	"pcdn-server/protos"
+
+	"go.uber.org/zap"
+	"nhooyr.io/websocket"
+	"nhooyr.io/websocket/wsjson"
+)
+
+var sappers map[int64]*Sapper
+
+type Sapper struct {
+	Id   int64
+	Uuid string
+
+	offline bool
+
+	conn     *websocket.Conn
+	commands chan protos.MethodValue
+}
+
+func init() {
+	sappers = make(map[int64]*Sapper)
+
+	go func() {
+		for {
+			time.Sleep(time.Second)
+
+			for k, v := range sappers {
+				fmt.Println(">>>>>>>>>>>>>>>>>>>", k, v.Id)
+				v.SendCommand(protos.COMMAND_SCREEN)
+			}
+		}
+	}()
+}
+
+func newSapper(id int64, uuid string, conn *websocket.Conn) *Sapper {
+	s := &Sapper{
+		Id:       id,
+		Uuid:     uuid,
+		conn:     conn,
+		commands: make(chan protos.MethodValue, 3),
+	}
+
+	go s.eventLoop()
+
+	return s
+}
+
+func (p *Sapper) eventLoop() {
+	for !p.offline {
+		cmd := protos.None
+		select {
+		case cmd = <-p.commands:
+			fmt.Println("Received from ch1", cmd)
+
+		case <-time.After(time.Second):
+			fmt.Println("Timeout")
+			continue
+		}
+
+		// write
+		nowStr := time.Now().Format("2006-01-02 15:04:05")
+		resp := protos.HeartbeatReq{
+			UUID:   p.Uuid,
+			Time:   nowStr,
+			Method: cmd,
+		}
+		resp.Id = p.Id
+
+		ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+		if err := wsjson.Write(ctx, p.conn, resp); err != nil {
+			common.Logger.Error("wsjson.Write ERR: ", zap.Error(err))
+		}
+	}
+
+}
+
+func (p *Sapper) Offline() {
+	p.offline = true
+}
+
+func (p *Sapper) SendCommand(command protos.MethodValue) {
+	p.commands <- command
+}

@@ -1,0 +1,10 @@
+pid: "/tmp/pcdn.pid"
+access_name: "pcdn-server-01" # 每个接入点一个名字，不能空
+log_dir: "./logs/" # 日志目录
+log_level: "debug"
+http_server_addr: ":10000"
+tcp_server_addr: ":10001"
+# mysql_urn: "root:lhisroot@tcp(127.0.0.1:3306)/pcdn?charset=utf8mb4&parseTime=True&loc=Local"
+pg_urn: "host=localhost user=pcdn password=pcdn12321 dbname=pcdn port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+redis_addr: "127.0.0.1:6379"
+img_dir: "/opt/pcdn-server/images/" # 图片上传目录
