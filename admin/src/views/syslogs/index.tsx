@@ -26,7 +26,7 @@ import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
-export default function Logs() {
+export default function Syslogs() {
   const [logs, setLogs] = useState<BusinessLogModel[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('CREATE_DEVICE')

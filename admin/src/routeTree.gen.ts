@@ -28,8 +28,8 @@ import { Route as ClerkAuthenticatedRouteImport } from './routes/clerk/_authenti
 import { Route as ClerkauthRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/users/index'
+import { Route as AuthenticatedSyslogsIndexImport } from './routes/_authenticated/syslogs/index'
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
-import { Route as AuthenticatedLogsIndexImport } from './routes/_authenticated/logs/index'
 import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedDevicesIndexImport } from './routes/_authenticated/devices/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
@@ -145,6 +145,12 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
+const AuthenticatedSyslogsIndexRoute = AuthenticatedSyslogsIndexImport.update({
+  id: '/syslogs/',
+  path: '/syslogs/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 const AuthenticatedSettingsIndexRoute = AuthenticatedSettingsIndexImport.update(
   {
     id: '/',
@@ -152,12 +158,6 @@ const AuthenticatedSettingsIndexRoute = AuthenticatedSettingsIndexImport.update(
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any,
 )
-
-const AuthenticatedLogsIndexRoute = AuthenticatedLogsIndexImport.update({
-  id: '/logs/',
-  path: '/logs/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexImport.update({
@@ -424,19 +424,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/logs/': {
-      id: '/_authenticated/logs/'
-      path: '/logs'
-      fullPath: '/logs'
-      preLoaderRoute: typeof AuthenticatedLogsIndexImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
       fullPath: '/settings/'
       preLoaderRoute: typeof AuthenticatedSettingsIndexImport
       parentRoute: typeof AuthenticatedSettingsRouteImport
+    }
+    '/_authenticated/syslogs/': {
+      id: '/_authenticated/syslogs/'
+      path: '/syslogs'
+      fullPath: '/syslogs'
+      preLoaderRoute: typeof AuthenticatedSyslogsIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
@@ -480,7 +480,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedDevicesIndexRoute: typeof AuthenticatedDevicesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedLogsIndexRoute: typeof AuthenticatedLogsIndexRoute
+  AuthenticatedSyslogsIndexRoute: typeof AuthenticatedSyslogsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
 
@@ -491,7 +491,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedDevicesIndexRoute: AuthenticatedDevicesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedLogsIndexRoute: AuthenticatedLogsIndexRoute,
+  AuthenticatedSyslogsIndexRoute: AuthenticatedSyslogsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }
 
@@ -568,8 +568,8 @@ export interface FileRoutesByFullPath {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/devices': typeof AuthenticatedDevicesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/logs': typeof AuthenticatedLogsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/syslogs': typeof AuthenticatedSyslogsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
 }
 
@@ -597,8 +597,8 @@ export interface FileRoutesByTo {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/devices': typeof AuthenticatedDevicesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/logs': typeof AuthenticatedLogsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/syslogs': typeof AuthenticatedSyslogsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
 }
 
@@ -631,8 +631,8 @@ export interface FileRoutesById {
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/devices/': typeof AuthenticatedDevicesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/_authenticated/logs/': typeof AuthenticatedLogsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/syslogs/': typeof AuthenticatedSyslogsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
 }
 
@@ -665,8 +665,8 @@ export interface FileRouteTypes {
     | '/chats'
     | '/devices'
     | '/help-center'
-    | '/logs'
     | '/settings/'
+    | '/syslogs'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -693,8 +693,8 @@ export interface FileRouteTypes {
     | '/chats'
     | '/devices'
     | '/help-center'
-    | '/logs'
     | '/settings'
+    | '/syslogs'
     | '/users'
   id:
     | '__root__'
@@ -725,8 +725,8 @@ export interface FileRouteTypes {
     | '/_authenticated/chats/'
     | '/_authenticated/devices/'
     | '/_authenticated/help-center/'
-    | '/_authenticated/logs/'
     | '/_authenticated/settings/'
+    | '/_authenticated/syslogs/'
     | '/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
@@ -794,7 +794,7 @@ export const routeTree = rootRoute
         "/_authenticated/chats/",
         "/_authenticated/devices/",
         "/_authenticated/help-center/",
-        "/_authenticated/logs/",
+        "/_authenticated/syslogs/",
         "/_authenticated/users/"
       ]
     },
@@ -909,13 +909,13 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/help-center/index.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/logs/": {
-      "filePath": "_authenticated/logs/index.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/settings/": {
       "filePath": "_authenticated/settings/index.tsx",
       "parent": "/_authenticated/settings"
+    },
+    "/_authenticated/syslogs/": {
+      "filePath": "_authenticated/syslogs/index.tsx",
+      "parent": "/_authenticated"
     },
     "/_authenticated/users/": {
       "filePath": "_authenticated/users/index.tsx",
